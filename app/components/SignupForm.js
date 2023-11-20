@@ -204,7 +204,7 @@ const SignupForm = ({}) => {
                 />
                  <BairroSelect
                   value={values.codbairro}
-                  onValueChange={handleChange('codbairro')}
+                  onValueChange={value => handleChange('codbairro')(value)}
                   label="Bairro"
                   placeholder="Selecione o bairro..."
                 />

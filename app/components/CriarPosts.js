@@ -1,0 +1,303 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Modal,
+  TouchableHighlight,
+} from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
+const CreatePostScreen = () => {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [imageUri, setImageUri] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [errorImage, setErrorImage] = useState('');
+  const [errorTitle, setErrorTitle] = useState('');
+  const [errorContent, setErrorContent] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        console.error('Permissão para acessar a galeria foi negada!');
+      }
+    })();
+  }, []);
+
+  const handleCreatePost = () => {
+    // Verificar se os campos obrigatórios foram preenchidos
+    if (!imageUri) {
+      setErrorImage('Selecione uma imagem para a publicação');
+    } else {
+      setErrorImage('');
+    }
+
+    if (!title) {
+      setErrorTitle('Preencha o campo de título.');
+    } else {
+      setErrorTitle('');
+    }
+
+    if (!content) {
+      setErrorContent('Preencha o campo de descrição.');
+    } else {
+      setErrorContent('');
+    }
+
+    // Verificar se algum dos campos está vazio
+    if (!imageUri || !title || !content) {
+      return;
+    }
+
+    // Lógica para criar o post (simulação de sucesso)
+    console.log('Simulação de post criado com sucesso:', { title, content, imageUri });
+
+    // Exibir o modal de feedback
+    setModalVisible(true);
+
+    // Limpar os campos após a criação do post
+    setTitle('');
+    setContent('');
+    setImageUri('');
+    setErrorImage('');
+    setErrorTitle('');
+    setErrorContent('');
+  };
+
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.cancelled) {
+        setImageUri(result.uri);
+        setErrorImage(''); // Limpar mensagem de erro ao selecionar uma imagem
+      }
+    } catch (error) {
+      console.error('Erro ao escolher imagem da galeria:', error);
+    }
+  };
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.container}
+        extraScrollHeight={Platform.select({ ios: 50, android: 0 })}
+        enableOnAndroid
+      >
+        <Text style={styles.title}>Criar Publicação</Text>
+
+        <View style={styles.formContainer}>
+          <View style={styles.imageContainer}>
+            <Text style={styles.label}>Capa:</Text>
+            <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+              {imageUri ? (
+                <Image source={{ uri: imageUri }} style={styles.previewImage} />
+              ) : (
+                <>
+                  <AntDesign name="picture" size={40} color="#FFA500" />
+                  <Text style={styles.imagePickerText}>Adicionar Imagem</Text>
+                </>
+              )}
+            </TouchableOpacity>
+            {errorImage ? <Text style={styles.errorText}>{errorImage}</Text> : null}
+          </View>
+
+          <Text style={styles.label}>Título:</Text>
+          <TextInput
+            style={styles.titleInput}
+            placeholder="Digite o título..."
+            placeholderTextColor="#ccc"
+            value={title}
+            onChangeText={(text) => {
+              setTitle(text);
+              setErrorTitle(''); // Limpar mensagem de erro ao digitar no campo
+            }}
+          />
+          {errorTitle ? <Text style={styles.errorText}>{errorTitle}</Text> : null}
+
+          <Text style={styles.label}>Descrição:</Text>
+          <TextInput
+            style={styles.descriptionInput}
+            placeholder="Nos conte mais sobre sua postagem..."
+            placeholderTextColor="#ccc"
+            multiline
+            numberOfLines={4}
+            value={content}
+            onChangeText={(text) => {
+              setContent(text);
+              setErrorContent(''); // Limpar mensagem de erro ao digitar no campo
+            }}
+          />
+          {errorContent ? <Text style={styles.errorText}>{errorContent}</Text> : null}
+        </View>
+
+        <TouchableOpacity style={styles.postButton} onPress={handleCreatePost}>
+          <Text style={styles.postButtonText}>Postar</Text>
+        </TouchableOpacity>
+
+        <Modal
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <AntDesign name="checkcircle" size={128} color="#FFA500" />
+              <Text style={styles.modalText}>Publicação concluída com sucesso!</Text>
+              <TouchableHighlight
+                style={styles.okButton}
+                onPress={closeModal}
+              >
+                <Text style={styles.okButtonText}>OK</Text>
+              </TouchableHighlight>
+            </View>
+          </View>
+        </Modal>
+      </KeyboardAwareScrollView>
+    </TouchableWithoutFeedback>
+  );
+};
+
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    backgroundColor: '#fff',
+    padding: 16,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+    marginTop: -20,
+    color: '#8B4513', // Marrom
+  },
+  formContainer: {
+    marginTop: 40,
+  },
+  imageContainer: {
+    marginBottom: 24,
+  },
+  imagePicker: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
+  previewImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    borderRadius: 8,
+  },
+  imagePickerText: {
+    color: '#FFA500', // Laranja
+    marginTop: 8,
+  },
+  label: {
+    fontSize: 18,
+    marginBottom: 8,
+    color: '#8B4513', // Marrom
+    fontWeight: 'bold',
+  },
+  titleInput: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  descriptionInput: {
+    height: 80,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 10,
+    borderRadius: 4,
+    fontSize: 16,
+  },
+  postButton: {
+    backgroundColor: '#FFA500', // Laranja
+    padding: 16,
+    alignItems: 'center',
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    marginTop: 50,
+  },
+  postButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginTop: 16,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  okButton: {
+    backgroundColor: '#FFA500',
+    padding: 16,
+    borderRadius: 8,
+  },
+  okButtonText: {
+    
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    width: 100,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginTop: 5,
+  },
+});
+
+export default CreatePostScreen;

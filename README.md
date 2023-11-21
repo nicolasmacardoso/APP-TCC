@@ -1,2 +1,2 @@
 # front-end-main
- apptcc feito na satc
+FRONT-END do TCC, feito no curso de informática.

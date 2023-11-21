@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, Keyboard} from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
@@ -73,179 +73,179 @@ const SignupForm = ({}) => {
   };
 
   return (
-    <FormContainer>
-      {error ? (
-        <Text style={{ color: 'red', fontSize: 18, textAlign: 'center' }}>
-          {error}
-        </Text>
-      ) : null}
-      {successMessage ? (
-        <Text style={{ color: 'green', fontSize: 18, textAlign: 'center' }}>
-          {successMessage}
-        </Text>
-      ) : null}
-
-      <Formik
-        initialValues={{
-          nome: '',
-          usuario: '',
-          cpf: '',
-          email: '',
-          senha: '',
-          confirmSenha: '',
-          rua: '',
-          complemento: '',
-          numero_casa: '',
-          codbairro: '',
-        }}
-        validationSchema={step === 1 ? validationSchema : validationSchemaPersonalInfo}
-        onSubmit={signUp}
-       >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          touched,
-          errors,
-          isSubmitting,
-        }) => (
-          <>
-            {step === 1 && (
-              <>
-                <FormInput
-                  value={values.nome}
-                  error={touched.nome && errors.nome}
-                  onChangeText={handleChange('nome')}
-                  onBlur={handleBlur('nome')}
-                  label="Nome Completo"
-                  placeholder="Digite seu nome completo..."
-                  placeholderTextColor="#A9A9A9"
-                />
-                <FormInput
-                  value={values.usuario}
-                  error={touched.usuario && errors.usuario}
-                  onChangeText={handleChange('usuario')}
-                  onBlur={handleBlur('usuario')}
-                  label="Nome de Usuário"
-                  placeholder="Digite seu nome de usuário..."
-                  placeholderTextColor="#A9A9A9"
-                />
-                <View style={styles.labelContainer}>
-                  <Text style={styles.label}>CPF</Text>
-                </View>
-                {touched.cpf && errors.cpf && (
-                  <Text style={{ color: 'red', fontSize: 16, textAlign: 'right',marginTop: -30, marginBottom: 10.5,}}>
-                    {errors.cpf}
-                  </Text>
-                )}
-                <TextInputMask
-                  type={'cpf'}
-                  options={{
-                    maskType: 'CPF',
-                    withDDD: true,
-                    dddMask: '9',
-                  }}
-                  value={values.cpf}
-                  onChangeText={(text) => handleChange('cpf')(text.replace(/\D/g, ''))}
-                  onBlur={handleBlur('cpf')}
-                  style={styles.input}
-                  placeholder="Digite seu CPF..."
-                  placeholderTextColor="#A9A9A9"
-                  keyboardType="numeric"
-                />
-                <FormInput
-                  value={values.email}
-                  error={touched.email && errors.email}
-                  onChangeText={handleChange('email')}
-                  onBlur={handleBlur('email')}
-                  autoCapitalize="none"
-                  label="E-mail"
-                  placeholder="Digite seu e-mail..."
-                  placeholderTextColor="#A9A9A9"
-                />
-                <FormInput
-                  value={values.senha}
-                  error={touched.senha && errors.senha}
-                  onChangeText={handleChange('senha')}
-                  onBlur={handleBlur('senha')}
-                  autoCapitalize="none"
-                  secureTextEntry
-                  label="Senha"
-                  placeholder="Digite sua senha..."
-                  placeholderTextColor="#A9A9A9"
-                />
-                <FormInput
-                  value={values.confirmSenha}
-                  error={touched.confirmSenha && errors.confirmSenha}
-                  onChangeText={handleChange('confirmSenha')}
-                  onBlur={handleBlur('confirmSenha')}
-                  autoCapitalize="none"
-                  secureTextEntry
-                  label="Confirme a Senha"
-                  placeholder="Confirme sua senha..."
-                  placeholderTextColor="#A9A9A9"
-                />
-              </>
-            )}
-            {step === 2 && (
-              <>
-                <FormInput
-                  value={values.rua}
-                  error={touched.rua && errors.rua}
-                  onChangeText={handleChange('rua')}
-                  onBlur={handleBlur('rua')}
-                  label="Endereço"
-                  placeholder="Digite seu endereço..."
-                  placeholderTextColor="#A9A9A9"
-                />
-                <FormInput
-                  value={values.complemento}
-                  error={touched.complemento && errors.complemento}
-                  onChangeText={handleChange('complemento')}
-                  onBlur={handleBlur('complemento')}
-                  label="Complemento(Opcional)"
-                  placeholder="Digite o complemento..."
-                  placeholderTextColor="#A9A9A9"
-                />
-                <FormInput
-                  value={values.numero_casa}
-                  error={touched.numero_casa && errors.numero_casa}
-                  onChangeText={handleChange('numero_casa')}
-                  onBlur={handleBlur('numero_casa')}
-                  label="Número"
-                  placeholder="Digite o número..."
-                  placeholderTextColor="#A9A9A9"
-                />
-                 <BairroSelect
-                  value={values.codbairro}
-                  onValueChange={handleChange('codbairro')}
-                  label="Bairro"
-                  placeholder="Selecione o bairro..."
-                />
-              </>
-            )}
-              <FormSubmitButton
-                submitting={isSubmitting}
-                onPress={handleSubmit}
-                title={step === 1 ? 'Continuar' : 'Cadastrar'}
-              />
-              {step === 2 && (
-                <View style={{ marginTop: 20 }}>
-                  <FormSubmitButton
-                    submitting={isSubmitting}
-                    onPress={() => {
-                      setStep(1);
-                      setSuccessMessage('');
-                    }}
-                    title={'Voltar'}
+      <FormContainer>
+        {error ? (
+          <Text style={{ color: 'red', fontSize: 18, textAlign: 'center' }}>
+            {error}
+          </Text>
+        ) : null}
+        {successMessage ? (
+          <Text style={{ color: 'green', fontSize: 18, textAlign: 'center' }}>
+            {successMessage}
+          </Text>
+        ) : null}
+        <Formik
+          initialValues={{
+            nome: '',
+            usuario: '',
+            cpf: '',
+            email: '',
+            senha: '',
+            confirmSenha: '',
+            rua: '',
+            complemento: '',
+            numero_casa: '',
+            codbairro: '',
+          }}
+          validationSchema={step === 1 ? validationSchema : validationSchemaPersonalInfo}
+          onSubmit={signUp}
+         >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            touched,
+            errors,
+            isSubmitting,
+          }) => (
+            <>
+              {step === 1 && (
+                <>
+                  <FormInput
+                    value={values.nome}
+                    error={touched.nome && errors.nome}
+                    onChangeText={handleChange('nome')}
+                    onBlur={handleBlur('nome')}
+                    label="Nome Completo"
+                    placeholder="Digite seu nome completo..."
+                    placeholderTextColor="#A9A9A9"
                   />
-                </View>
+                  <FormInput
+                    value={values.usuario}
+                    error={touched.usuario && errors.usuario}
+                    onChangeText={handleChange('usuario')}
+                    onBlur={handleBlur('usuario')}
+                    label="Nome de Usuário"
+                    placeholder="Digite seu nome de usuário..."
+                    placeholderTextColor="#A9A9A9"
+                  />
+                  <View style={styles.labelContainer}>
+                    <Text style={styles.label}>CPF</Text>
+                  </View>
+                  {touched.cpf && errors.cpf && (
+                    <Text style={{ color: 'red', fontSize: 16, textAlign: 'right',marginTop: -30, marginBottom: 10.5,}}>
+                      {errors.cpf}
+                    </Text>
+                  )}
+                  <TextInputMask
+                    type={'cpf'}
+                    options={{
+                      maskType: 'CPF',
+                      withDDD: true,
+                      dddMask: '9',
+                    }}
+                    value={values.cpf}
+                    onChangeText={(text) => handleChange('cpf')(text.replace(/\D/g, ''))}
+                    onBlur={handleBlur('cpf')}
+                    style={styles.input}
+                    placeholder="Digite seu CPF..."
+                    placeholderTextColor="#A9A9A9"
+                    keyboardType="numeric"
+                  />
+                  <FormInput
+                    value={values.email}
+                    error={touched.email && errors.email}
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                    autoCapitalize="none"
+                    label="E-mail"
+                    placeholder="Digite seu e-mail..."
+                    placeholderTextColor="#A9A9A9"
+                  />
+                  <FormInput
+                    value={values.senha}
+                    error={touched.senha && errors.senha}
+                    onChangeText={handleChange('senha')}
+                    onBlur={handleBlur('senha')}
+                    autoCapitalize="none"
+                    secureTextEntry
+                    label="Senha"
+                    placeholder="Digite sua senha..."
+                    placeholderTextColor="#A9A9A9"
+                  />
+                  <FormInput
+                    value={values.confirmSenha}
+                    error={touched.confirmSenha && errors.confirmSenha}
+                    onChangeText={handleChange('confirmSenha')}
+                    onBlur={handleBlur('confirmSenha')}
+                    autoCapitalize="none"
+                    secureTextEntry
+                    label="Confirme a Senha"
+                    placeholder="Confirme sua senha..."
+                    placeholderTextColor="#A9A9A9"
+                  />
+                </>
               )}
-          </>
-        )}
-      </Formik>
-    </FormContainer>
+              {step === 2 && (
+                <>
+                  <FormInput
+                    value={values.rua}
+                    error={touched.rua && errors.rua}
+                    onChangeText={handleChange('rua')}
+                    onBlur={handleBlur('rua')}
+                    label="Endereço"
+                    placeholder="Digite seu endereço..."
+                    placeholderTextColor="#A9A9A9"
+                  />
+                  <FormInput
+                    value={values.complemento}
+                    error={touched.complemento && errors.complemento}
+                    onChangeText={handleChange('complemento')}
+                    onBlur={handleBlur('complemento')}
+                    label="Complemento(Opcional)"
+                    placeholder="Digite o complemento..."
+                    placeholderTextColor="#A9A9A9"
+                  />
+                  <FormInput
+                    value={values.numero_casa}
+                    error={touched.numero_casa && errors.numero_casa}
+                    onChangeText={handleChange('numero_casa')}
+                    onBlur={handleBlur('numero_casa')}
+                    label="Número"
+                    placeholder="Digite o número..."
+                    placeholderTextColor="#A9A9A9"
+                  />
+                   <BairroSelect
+                    value={values.codbairro}
+                    onValueChange={handleChange('codbairro')}
+                    label="Bairro"
+                    placeholder="Selecione o bairro..."
+                  />
+                </>
+              )}
+                <FormSubmitButton
+                  submitting={isSubmitting}
+                  onPress={handleSubmit}
+                  title={step === 1 ? 'Continuar' : 'Cadastrar'}
+                />
+                {step === 2 && (
+                  <View style={{ marginTop: 20 }}>
+                    <FormSubmitButton
+                      submitting={isSubmitting}
+                      onPress={() => {
+                        setStep(1);
+                        setSuccessMessage('');
+                      }}
+                      title={'Voltar'}
+                    />
+                  </View>
+                )}
+            </>
+          )}
+        </Formik>
+      </FormContainer>
+      
   );
 };
 

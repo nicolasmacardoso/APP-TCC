@@ -42,7 +42,7 @@ export default function AppForm({ navigation }) {
   });
 
   return (
-    <View style={{ flex: 1, paddingTop: 180 }}>
+    <View style={{ flex: 1, paddingTop: 180}}>
       <View style={{ height: 80 }}>
         <FormHeader
           leftHeading='Bem-vindo '

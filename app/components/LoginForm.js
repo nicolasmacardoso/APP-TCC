@@ -11,12 +11,12 @@ const LoginForm = () => {
   const { setIsLoggedIn, setProfile } = useLogin();
   const [userInfo, setUserInfo] = useState({
     email: '',
-    password: '',
+    senha: '',
   });
 
   const [error, setError] = useState('');
 
-  const { email, password } = userInfo;
+  const { email, senha } = userInfo;
 
   const handleOnChangeText = (value, fieldName) => {
     setUserInfo({ ...userInfo, [fieldName]: value });
@@ -28,7 +28,7 @@ const LoginForm = () => {
 
     if (!isValidEmail(email)) return updateError('Email inválido.', setError);
 
-    if (!password.trim() || password.length < 8)
+    if (!senha.trim() || senha.length < 8)
       return updateError('Senha muito curta.', setError);
 
     return true;
@@ -37,21 +37,26 @@ const LoginForm = () => {
   const submitForm = async () => {
     if (isValidForm()) {
       try {
-        const res = await client.post('/sign-in', { ...userInfo });
-
+        const res = await client.post('https://cima-production.up.railway.app/usuario', {
+          email: userInfo.email,
+          senha: userInfo.senha,
+        });
+  
         if (res.data.success) {
-          setUserInfo({ email: '', password: '' });
+          setUserInfo({ email: '', senha: '' });
           setProfile(res.data.usuario);
           setIsLoggedIn(true);
+        } else {
+          updateError(res.data.message || 'Erro desconhecido.', setError);
         }
-        setIsLoggedIn(true);
-        console.log(res.data);
       } catch (error) {
-        console.log(error);
-        setIsLoggedIn(true);
+        console.error('Error:', error.message);
+        updateError('Erro ao tentar fazer login. Tente novamente mais tarde.', setError);
       }
     }
   };
+  
+  
 
   return (
     <FormContainer>
@@ -69,8 +74,8 @@ const LoginForm = () => {
         placeholderTextColor="#A9A9A9"
       />
       <FormInput
-        value={password}
-        onChangeText={value => handleOnChangeText(value, 'password')}
+        value={senha}
+        onChangeText={value => handleOnChangeText(value, 'senha')}
         label='Senha'
         placeholder='Digite sua senha...'
         autoCapitalize='none'

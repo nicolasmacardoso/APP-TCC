@@ -30,24 +30,27 @@ const LoginForm = () => {
 
     if (!senha.trim() || senha.length < 8)
       return updateError('Senha muito curta.', setError);
-
+r
     return true;
   };
 
   const submitForm = async () => {
     if (isValidForm()) {
       try {
-        const res = await client.post('https://cima-production.up.railway.app/usuario', {
-          email: userInfo.email,
-          senha: userInfo.senha,
-        });
+        const res = await client.get(`https://cima-production.up.railway.app/usuario?email=${userInfo.email}`);
+    
+        if (res.data.success && res.data.usuario) {
+          const user = res.data.usuario;
   
-        if (res.data.success) {
-          setUserInfo({ email: '', senha: '' });
-          setProfile(res.data.usuario);
-          setIsLoggedIn(true);
+          if (user.senha === userInfo.senha.trim()) {
+            setUserInfo({ email: '', senha: '' });
+            setProfile(user);
+            setIsLoggedIn(true);
+          } else {
+            updateError('Credenciais inválidas. Verifique seu email e senha.', setError);
+          }
         } else {
-          updateError(res.data.message || 'Erro desconhecido.', setError);
+          updateError('Usuário não encontrado. Verifique seu email.', setError);
         }
       } catch (error) {
         console.error('Error:', error.message);
@@ -55,6 +58,7 @@ const LoginForm = () => {
       }
     }
   };
+  
   
   
 

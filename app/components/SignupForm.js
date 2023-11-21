@@ -8,6 +8,7 @@ import BairroSelect from './BairroSelect';
 import FormContainer from './FormContainer';
 import FormInput from './FormInput';
 import FormSubmitButton from './FormSubmitButton';
+import { TextInputMask } from 'react-native-masked-text';
 
 const SignupForm = ({}) => {
   const [error, setError] = useState('');
@@ -16,15 +17,17 @@ const SignupForm = ({}) => {
   const [step1Data, setStep1Data] = useState(null);
 
   const validationSchema = Yup.object({
-    nome: Yup.string().trim().required('Nome Completo é obrigatório.'),
-    usuario: Yup.string().trim().required('Nome de Usuário é obrigatório.'),
-    cpf: Yup.string().trim().required('CPF é obrigatório.'),
+    nome: Yup.string().trim().required('Nome é obrigatório.'),
+    usuario: Yup.string().trim().required('Usuário é obrigatório.'),
+    cpf: Yup.string()
+    .matches(/^\d{11}$/, 'CPF inválido.')
+    .required('CPF é obrigatório.'),
     email: Yup.string().email('E-mail inválido.').required('E-mail é obrigatório.'),
     senha: Yup.string().trim().min(8, 'Senha muito curta.').required('Senha é obrigatória.'),
     confirmSenha: Yup.string().oneOf(
       [Yup.ref('senha'), null],
       'As senhas não coincidem.'
-    ).required('Confirmação de senha é obrigatória.'),
+    ).required('Confirme sua senha.'),
   });
 
   const validationSchemaPersonalInfo = Yup.object({
@@ -32,16 +35,15 @@ const SignupForm = ({}) => {
     complemento: Yup.string(),
     numero_casa: Yup.string().required('Número é obrigatório.'),
     codbairro: Yup.string().required('Bairro é obrigatório.'),
-  });
+  });  
 
   const signUp = async (values, formikActions) => {
     try {
       if (step === 1) {
-        // Se estiver no Step 1, apenas atualiza os dados do Step 1
         setStep1Data(values);
-        setStep(2); // Muda para o Step 2
+        setSuccessMessage('');
+        setStep(2); 
       } else {
-        // Se estiver no Step 2, envia os dados do Step 1 e Step 2 para o backend
         const response = await axios.post('https://cima-production.up.railway.app/usuario_temp', {
           ...step1Data,
           rua: values.rua,
@@ -52,8 +54,7 @@ const SignupForm = ({}) => {
   
         if (response.status === 201) {
           setSuccessMessage('Cadastro bem sucedido. Sua conta está aguardando aprovação, você será notificado quando estiver ativa.');
-          formikActions.resetForm(); // Limpa o formulário após o sucesso
-          setStep(1); // Volta para o Step 1 após o sucesso
+          formikActions.resetForm(); 
         } else {
           updateError(response.data.message || 'Erro desconhecido.', setError);
         }
@@ -130,14 +131,28 @@ const SignupForm = ({}) => {
                   placeholder="Digite seu nome de usuário..."
                   placeholderTextColor="#A9A9A9"
                 />
-                <FormInput
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>CPF</Text>
+                </View>
+                {touched.cpf && errors.cpf && (
+                  <Text style={{ color: 'red', fontSize: 16, textAlign: 'right',marginTop: -30, marginBottom: 10.5,}}>
+                    {errors.cpf}
+                  </Text>
+                )}
+                <TextInputMask
+                  type={'cpf'}
+                  options={{
+                    maskType: 'CPF',
+                    withDDD: true,
+                    dddMask: '9',
+                  }}
                   value={values.cpf}
-                  error={touched.cpf && errors.cpf}
-                  onChangeText={handleChange('cpf')}
+                  onChangeText={(text) => handleChange('cpf')(text.replace(/\D/g, ''))}
                   onBlur={handleBlur('cpf')}
-                  label="CPF"
-                  placeholder="Digite seu cpf..."
+                  style={styles.input}
+                  placeholder="Digite seu CPF..."
                   placeholderTextColor="#A9A9A9"
+                  keyboardType="numeric"
                 />
                 <FormInput
                   value={values.email}
@@ -204,7 +219,7 @@ const SignupForm = ({}) => {
                 />
                  <BairroSelect
                   value={values.codbairro}
-                  onValueChange={value => handleChange('codbairro')(value)}
+                  onValueChange={handleChange('codbairro')}
                   label="Bairro"
                   placeholder="Selecione o bairro..."
                 />
@@ -233,5 +248,25 @@ const SignupForm = ({}) => {
     </FormContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  input: {
+    borderWidth: 1,
+    borderColor: '#1b1b33',
+    height: 35,
+    borderRadius: 8,
+    fontSize: 16,
+    paddingLeft: 10,
+    marginBottom: 20,
+  },
+  labelContainer: {
+    marginBottom: 5,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black', // ou a cor desejada
+  },
+});
 
 export default SignupForm;

@@ -44,8 +44,18 @@ const LoginForm = () => {
   
           if (user.senha === userInfo.senha.trim()) {
             setUserInfo({ email: '', senha: '' });
-            setProfile(user);
-            setIsLoggedIn(true);
+
+            // Verifica se o usuário está na tabela usuario_temp
+            const isTempUser = await checkTempUser(user.id);
+            
+            if (isTempUser) {
+              // Usuário está aguardando aprovação
+              updateError('Sua conta está aguardando aprovação', setError, 'blue');
+            } else {
+              // Usuário aprovado
+              setProfile(user);
+              setIsLoggedIn(true);
+            }
           } else {
             updateError('Sua senha não condiz com seu email.', setError);
           }
@@ -58,9 +68,17 @@ const LoginForm = () => {
       }
     }
   };
-  
-  
-  
+
+  // Função para verificar se o usuário está na tabela usuario_temp
+  const checkTempUser = async (userId) => {
+    try {
+      const response = await client.get(`https://cima-production.up.railway.app/usuario_temp/${userId}`);
+      return response.data.success;
+    } catch (error) {
+      console.error('Error ao verificar usuário temporário:', error.message);
+      return false;
+    }
+  };
 
   return (
     <FormContainer>

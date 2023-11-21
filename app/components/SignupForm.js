@@ -67,11 +67,6 @@ const SignupForm = ({}) => {
     }
   };
 
-  const updateError = (message, setError) => {
-    setError(message);
-    setTimeout(() => setError(''), 5000);
-  };
-
   return (
       <FormContainer>
         {error ? (

@@ -30,14 +30,14 @@ const LoginForm = () => {
 
     if (!senha.trim() || senha.length < 8)
       return updateError('Senha muito curta.', setError);
-r
+
     return true;
   };
 
   const submitForm = async () => {
     if (isValidForm()) {
       try {
-        const res = await client.get(`https://cima-production.up.railway.app/usuario?email=${userInfo.email}`);
+        const res = await client.post(`https://cima-production.up.railway.app/usuariologin`, userInfo);
     
         if (res.data.success && res.data.usuario) {
           const user = res.data.usuario;
@@ -47,7 +47,7 @@ r
             setProfile(user);
             setIsLoggedIn(true);
           } else {
-            updateError('Credenciais inválidas. Verifique seu email e senha.', setError);
+            updateError('Sua senha não condiz com seu email.', setError);
           }
         } else {
           updateError('Usuário não encontrado. Verifique seu email.', setError);

@@ -14,7 +14,7 @@ function ChatPrincipal() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io('http://10.2.0.18:3000', {
+    socketRef.current = io('http://10.32.1.116:3000', {
       reconnection: true,
     });
 

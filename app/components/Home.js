@@ -32,7 +32,6 @@ const App = () => {
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar..."
-          // Adicione aqui a lógica para tratar a busca
         />
       </View>
       <View style={styles.postContainer}>
@@ -83,6 +82,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 8,
     borderRadius: 8,
+    placeholderColor: '#343433',
   },
   postContainer: {
     backgroundColor: '#fff',
@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
   post: {
     width: '48%', // 2% menos para a margem entre os quadrados
     aspectRatio: 0.7, // Mantendo a proporção 1:1 para ser um quadrado
-    backgroundColor: '#ADD8E6', // Azul claro
     borderRadius: 8,
     marginBottom: 16,
   },

@@ -13,7 +13,9 @@ import { useLogin } from './context/LoginProvider';
 const Drawer = createDrawerNavigator();
 
 const CustomDrawer = (props) => {
-  const { setIsLoggedIn, profile } = useLogin();
+  const { setIsLoggedIn, profile, user } = useLogin();
+
+  console.log('user:', user);
 
   const truncateString = (str, maxLength) => {
     if (str && str.length > maxLength) {
@@ -58,15 +60,14 @@ const CustomDrawer = (props) => {
         >
           <Image
             source={{
-              uri:
-                profile?.avatar ||
+              uri: profile?.avatar ||
                 'https://images.unsplash.com/photo-1624243225303-261cc3cd2fbc?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
             }}
             style={{ width: 60, height: 60, borderRadius: 30 }}
           />
           <View>
-            <Text>{truncateString("nicolas piscocin da silva bastos", 24)}</Text>
-            <Text>{truncateString("nicolasmacardoso@gmail.com", 20)}</Text>
+            <Text>{truncateString(user?.nome || "", 24)}</Text>
+            <Text>{truncateString(user?.email || "", 20)}</Text>
           </View>
         </View>
         <DrawerItemList {...props} />

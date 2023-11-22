@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Text } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons'; // Certifique-se de importar o ícone necessário
 import client from '../api/client';
 import { useLogin } from '../context/LoginProvider';
 import { isValidEmail, isValidObjField, updateError } from '../utils/methods';
 import FormContainer from './FormContainer';
-import FormInput from './FormInput';
 import FormSubmitButton from './FormSubmitButton';
-
+import FormInput from './FormInput';
 const LoginForm = () => {
   const { setIsLoggedIn, login } = useLogin();
   const [userInfo, setUserInfo] = useState({
@@ -15,9 +15,8 @@ const LoginForm = () => {
   });
 
   const [error, setError] = useState('');
-
   const { email, senha } = userInfo;
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleOnChangeText = (value, fieldName) => {
     setUserInfo({ ...userInfo, [fieldName]: value });
   };
@@ -85,8 +84,18 @@ const LoginForm = () => {
         placeholder="Digite sua senha..."
         autoCapitalize="none"
         placeholderTextColor="#A9A9A9"
-        secureTextEntry
+        secureTextEntry={!showPassword}
       />
+       <TouchableOpacity
+          onPress={() => setShowPassword(!showPassword)}
+          style={{ padding:10 }}
+        >
+          <FontAwesome
+            name={showPassword ? 'eye-slash' : 'eye'}
+            size={24}
+            color="black"
+          />
+        </TouchableOpacity>
       <FormSubmitButton onPress={submitForm} title="Entrar" />
     </FormContainer>
   );

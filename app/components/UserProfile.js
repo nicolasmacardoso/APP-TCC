@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Text, Dimensions, Image } from 'react-native';
-
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, StyleSheet, Text, Dimensions, Image, TouchableOpacity, Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { useLogin } from '../context/LoginProvider';
+import { FontAwesome } from '@expo/vector-icons'; 
 const windowWidth = Dimensions.get('window').width;
-
 const Perfil = () => {
-  const [profileImage, setProfileImage] = useState('https://placekitten.com/201/201');
+  const { profile } = useLogin();
+  const [profileImage, setProfileImage] = useState('');
   const [userName, setUserName] = useState('Piscosin Da Silva');
 
   const [posts, setPosts] = useState([
@@ -19,14 +21,46 @@ const Perfil = () => {
     { id: 9, content: 'Post 9 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/208/208', author: 'Ivy' },
     { id: 10, content: 'Post 10', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/209/209', author: 'Jack' },
     { id: 11, content: 'Post 11', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/210/210', author: 'Karen' },
-    { id: 12, content: 'Post 12', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/211/211', author: 'Leo' },
+    { id: 12, content: 'Post 12', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/210/210', author: 'Leo' },
     // Adicione mais postagens conforme necessário
   ]);
 
+  useEffect(() => {
+    if (profile) {
+      setUserName(profile.nome || 'Nome Padrão');
+      setProfileImage(profile.avatar || 'https://picwishhk.oss-cn-hongkong.aliyuncs.com/tasks/output/visual_background/3a47ff06-a426-415a-be0d-dcd7dca9edcf-image2.jpg?Expires=1700665367&OSSAccessKeyId=LTAI5tGjJnh66c1txANiRBQN&Signature=QK4HwxmhjizZ9TQL1RKIEhKaRMU%3D');
+    }
+  }, [profile]);
+
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+  
+      // Verifica se o usuário selecionou uma imagem
+      if (result.uri) {
+        setProfileImage(result.uri);
+      } else {
+        // Se não houver uma URI, utiliza a URL padrão
+        setProfileImage('https://picwishhk.oss-cn-hongkong.aliyuncs.com/tasks/output/visual_background/3a47ff06-a426-415a-be0d-dcd7dca9edcf-image2.jpg?Expires=1700665367&OSSAccessKeyId=LTAI5tGjJnh66c1txANiRBQN&Signature=QK4HwxmhjizZ9TQL1RKIEhKaRMU%3D');
+      }
+    } catch (error) {
+      Alert.alert('Erro ao selecionar a imagem', error.message);
+    }
+  };
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileContainer}>
-        <Image source={{ uri: profileImage }} style={styles.profileImage} />
+        <TouchableOpacity onPress={pickImage}>
+          <Image
+            source={{ uri: profileImage }}
+            style={styles.profileImage}
+          />
+        </TouchableOpacity>
         <Text style={styles.profileName}>{userName}</Text>
         <View style={styles.publicationsContainer}>
           <Text style={styles.publicationsText}> Suas Publicações</Text>
@@ -87,15 +121,22 @@ const styles = StyleSheet.create({
     position: 'relative', // Adicionado para posicionar corretamente o conteúdo fixo
   },
   profileImage: {
-    width: 200,
-    height: 200,
+    width: 180,
+    height: 180,
     borderRadius: 200,
     resizeMode: 'cover',
+    borderWidth: 5, // Adicionado para criar uma borda
+    borderColor: '#76bbff', // Adicionado para definir a cor da borda
   },
   profileName: {
     marginTop: 8,
     fontSize: 26,
     fontWeight: 'bold',
+    color: '#fff',
+  },
+  email: {
+    marginTop: 8,
+    fontSize: 18,
     color: '#fff',
   },
   postContainer: {

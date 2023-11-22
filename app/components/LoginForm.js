@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { Text } from 'react-native';
 import client from '../api/client';
 import { useLogin } from '../context/LoginProvider';
 import { isValidEmail, isValidObjField, updateError } from '../utils/methods';
@@ -8,7 +8,7 @@ import FormInput from './FormInput';
 import FormSubmitButton from './FormSubmitButton';
 
 const LoginForm = () => {
-  const { setIsLoggedIn, setProfile } = useLogin();
+  const { setIsLoggedIn, login } = useLogin();
   const [userInfo, setUserInfo] = useState({
     email: '',
     senha: '',
@@ -37,7 +37,10 @@ const LoginForm = () => {
   const submitForm = async () => {
     if (isValidForm()) {
       try {
-        const res = await client.post(`https://cima-production.up.railway.app/usuariologin`, userInfo);
+        const res = await client.post(
+          'https://cima-production.up.railway.app/usuariologin',
+          userInfo
+        );
 
         if (res.data.success && res.data.usuario) {
           const user = res.data.usuario;
@@ -45,7 +48,7 @@ const LoginForm = () => {
           if (user.senha === userInfo.senha.trim()) {
             setUserInfo({ email: '', senha: '' });
 
-            setProfile(user);
+            login(user); // Chama a função de login do LoginProvider
             setIsLoggedIn(true);
           } else {
             updateError('Sua senha não condiz com seu email.', setError);
@@ -69,22 +72,22 @@ const LoginForm = () => {
       ) : null}
       <FormInput
         value={email}
-        onChangeText={value => handleOnChangeText(value, 'email')}
-        label='Email'
-        placeholder='Digite seu email...'
-        autoCapitalize='none'
+        onChangeText={(value) => handleOnChangeText(value, 'email')}
+        label="Email"
+        placeholder="Digite seu email..."
+        autoCapitalize="none"
         placeholderTextColor="#A9A9A9"
       />
       <FormInput
         value={senha}
-        onChangeText={value => handleOnChangeText(value, 'senha')}
-        label='Senha'
-        placeholder='Digite sua senha...'
-        autoCapitalize='none'
+        onChangeText={(value) => handleOnChangeText(value, 'senha')}
+        label="Senha"
+        placeholder="Digite sua senha..."
+        autoCapitalize="none"
         placeholderTextColor="#A9A9A9"
         secureTextEntry
       />
-      <FormSubmitButton onPress={submitForm} title='Entrar' />
+      <FormSubmitButton onPress={submitForm} title="Entrar" />
     </FormContainer>
   );
 };

@@ -5,6 +5,7 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
+import { FontAwesome } from '@expo/vector-icons'; 
 
 import Home from './components/Home';
 import CriarPosts from './components/CriarPosts';
@@ -13,9 +14,24 @@ import { useLogin } from './context/LoginProvider';
 const Drawer = createDrawerNavigator();
 
 const CustomDrawer = (props) => {
-  const { setIsLoggedIn, profile, user } = useLogin();
+  const { setIsLoggedIn, profile } = useLogin();
 
-  console.log('user:', user);
+  const renderProfileImage = () => {
+    if (profile?.avatar) {
+      return (
+        <Image
+          source={{ uri: profile.avatar }}
+          style={{ width: 80, height: 80, borderRadius: 30 }}
+        />
+      );
+    } else {
+      return (
+        <View style={{ width: 80, height: 80, borderRadius: 50, backgroundColor: '#FFFFFF', borderColor: '#76bbff', borderWidth: 4 }}>
+          <FontAwesome name="user-circle" size={71.999} color="#757575" />
+        </View>
+      );
+    }
+  };
 
   const truncateString = (str, maxLength) => {
     if (str && str.length > maxLength) {
@@ -29,15 +45,16 @@ const CustomDrawer = (props) => {
       }
     }
     return str.toLowerCase();
-  };  
+  };
 
   const truncateName = (name, maxLength, prepositions) => {
     const words = name.split(' ');
     const filteredWords = words.map((word, index) => {
-      if (index === 0 || index === words.length - 1 || !prepositions.includes(word.toLowerCase())) {
+      const lowerCasedWord = word.toLowerCase();
+      if (index === 0 || index === words.length - 1 || !prepositions.includes(lowerCasedWord)) {
         return word.charAt(0).toUpperCase() + word.slice(1);
       } else {
-        return word.toLowerCase();
+        return lowerCasedWord;
       }
     });
     const truncatedName = filteredWords.join(' ');
@@ -58,16 +75,10 @@ const CustomDrawer = (props) => {
             marginBottom: 20,
           }}
         >
-          <Image
-            source={{
-              uri: profile?.avatar ||
-                'https://images.unsplash.com/photo-1624243225303-261cc3cd2fbc?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
-            }}
-            style={{ width: 60, height: 60, borderRadius: 30 }}
-          />
+          {renderProfileImage()}
           <View>
-            <Text>{truncateString(user?.nome || "", 24)}</Text>
-            <Text>{truncateString(user?.email || "", 20)}</Text>
+            <Text>{truncateName(profile?.nome || '', 20, ['de', 'da', 'das', 'dos', 'do'])}</Text>
+            <Text>{truncateString(profile?.email || '', 20)}</Text>
           </View>
         </View>
         <DrawerItemList {...props} />

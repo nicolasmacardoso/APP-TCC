@@ -13,7 +13,6 @@ const LoginForm = () => {
     email: '',
     senha: '',
   });
-
   const [error, setError] = useState('');
   const { email, senha } = userInfo;
   const [showPassword, setShowPassword] = useState(false);

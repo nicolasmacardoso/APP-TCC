@@ -7,6 +7,7 @@ const LoginProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null); 
 
   useEffect(() => {
     const loadUserFromStorage = async () => {
@@ -15,6 +16,7 @@ const LoginProvider = ({ children }) => {
 
         if (storedUser) {
           setProfile(JSON.parse(storedUser));
+          setUserId(parsedUser.id); // Armazene o ID do usuário
           setIsLoggedIn(true);
         }
       } catch (e) {
@@ -33,6 +35,7 @@ const LoginProvider = ({ children }) => {
       await AsyncStorage.setItem('@user', JSON.stringify(user));
 
       setProfile(user);
+      setUserId(user.id); // Armazene o ID do usuário
       setIsLoggedIn(true);
 
       console.log('Usuário logado:', user);
@@ -48,6 +51,7 @@ const LoginProvider = ({ children }) => {
       await AsyncStorage.removeItem('@user');
 
       setProfile({});
+      setUserId(null); // Limpe o ID do usuário
       setIsLoggedIn(false);
     } catch (e) {
       console.error('Erro ao remover usuário do AsyncStorage:', e);
@@ -56,7 +60,7 @@ const LoginProvider = ({ children }) => {
 
   return (
     <LoginContext.Provider
-      value={{ isLoggedIn, setIsLoggedIn, profile, setProfile, login, logout, loading }}
+      value={{ isLoggedIn, setIsLoggedIn, profile, setProfile, login, logout, loading, userId }}
     >
       {children}
     </LoginContext.Provider>

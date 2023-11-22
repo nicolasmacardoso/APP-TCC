@@ -23,7 +23,7 @@ const CustomDrawer = (props) => {
       return (
         <Image
           source={{ uri: profile.avatar }}
-          style={{ width: 80, height: 80, borderRadius: 30 }}
+          style={{ width: 80, height: 80, borderRadius: 100 }}
         />
       );
     } else {

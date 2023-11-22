@@ -3,11 +3,12 @@ import { View, ScrollView, StyleSheet, Text, Dimensions, Image, TouchableOpacity
 import * as ImagePicker from 'expo-image-picker';
 import { useLogin } from '../context/LoginProvider';
 import { FontAwesome } from '@expo/vector-icons'; 
+import axios from 'axios';
 
 const windowWidth = Dimensions.get('window').width;
 
 const Perfil = () => {
-  const { profile, setProfile } = useLogin(); 
+  const { profile, setProfile, userId } = useLogin(); 
   const [userName, setUserName] = useState('');
   const [profileImage, setProfileImage] = useState(''); 
 
@@ -28,16 +29,21 @@ const Perfil = () => {
   ]);
 
   useEffect(() => {
-    if (profile) {
-      setUserName(profile.usuario || 'Nome Padrão');
-    }
-  }, [profile]);
+    // Simulação de dados do perfil (substitua isso com sua lógica real)
+    const profileData = {
+      usuario: profile.usuario,
+      avatar: null, // Coloque a URL padrão da imagem do perfil aqui, se houver
+    };
+
+    setUserName(profileData.usuario);
+    setProfileImage(profileData.avatar);
+  }, []);
 
   const renderProfileImage = () => {
-    if (profile?.avatar) {
+    if (profileImage) {
       return (
         <Image
-          source={{ uri: profile.avatar }}
+          source={{ uri: profileImage }}
           style={{ width: 175, height: 175, borderRadius: 100, borderWidth: 5, borderColor: '#3E5481'}}
         />
       );
@@ -58,20 +64,32 @@ const Perfil = () => {
         aspect: [1, 1],
         quality: 1,
       });
-  
-      // Verifica se o usuário selecionou uma imagem
+
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        // Acesse a URI da primeira imagem selecionada
         const selectedImageUri = result.assets[0].uri;
-  
-        // Atualiza a imagem do perfil no estado local
-        setProfileImage(selectedImageUri);
-  
-        // Atualiza a imagem do perfil no contexto global
-        setProfile({ ...profile, avatar: selectedImageUri });
-      } else {
-        // Se não houver uma URI válida, utiliza a URL padrão
-        setProfileImage('https://picwishhk.oss-cn-hongkong.aliyuncs.com/tasks/output/visual_background/3a47ff06-a426-415a-be0d-dcd7dca9edcf-image2.jpg?Expires=1700665367&OSSAccessKeyId=LTAI5tGjJnh66c1txANiRBQN&Signature=QK4HwxmhjizZ9TQL1RKIEhKaRMU%3D');
+
+        // Criar um objeto FormData para enviar a imagem como parte do corpo da requisição
+        const formData = new FormData();
+        formData.append('imagem', {
+          uri: selectedImageUri,
+          type: 'image/jpeg', // Altere para o tipo de arquivo correto
+          name: 'avatar.jpg',
+        });
+
+        // Enviar a imagem para o servidor usando axios
+        const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}/imagem`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        if (response.status === 200) {
+          setProfileImage(selectedImageUri);
+          profile.avatar = selectedImageUri;
+          Alert.alert('Imagem atualizada com sucesso!');
+        } else {
+          Alert.alert('Erro ao enviar a imagem', 'A imagem não pôde ser enviada.');
+        }
       }
     } catch (error) {
       Alert.alert('Erro ao selecionar a imagem', error.message);
@@ -86,7 +104,7 @@ const Perfil = () => {
         </TouchableOpacity>
         <Text style={styles.profileName}>{userName}</Text>
         <View style={styles.publicationsContainer}>
-          <Text style={styles.publicationsText}> Suas Publicações</Text>
+          <Text style={styles.publicationsText}> Minhas Publicações</Text>
           <View style={styles.blueLine} />
         </View>
       </View>
@@ -129,8 +147,8 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: 'center',
-    marginTop: 60,
-    marginBottom: 16,
+    marginTop: 100,
+    marginBottom: 20,
     position: 'relative', // Adicionado para posicionar corretamente o conteúdo fixo
   },
   profileImage: {
@@ -140,7 +158,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   profileName: {
-    marginTop: 8,
+    marginTop: 30,
     fontSize: 26,
     fontWeight: 'bold',
     color: '#3E5481',
@@ -185,7 +203,7 @@ const styles = StyleSheet.create({
   publicationsText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#3E5481',
     marginTop: 0,
     bottom: -24,
     width: '100%',
@@ -194,7 +212,7 @@ const styles = StyleSheet.create({
   blueLine: {
     width: 200,
     height: 3,
-    backgroundColor: '#0000FF',
+    backgroundColor: '#F26101',
     marginTop: 0,
     position: 'fixed',
     bottom: -24,

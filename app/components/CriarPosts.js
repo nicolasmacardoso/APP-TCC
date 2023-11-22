@@ -83,7 +83,7 @@ const CreatePostScreen = () => {
         quality: 1,
       });
 
-      if (!result.cancelled) {
+      if (!result.canceled) {
         setImageUri(result.uri);
         setErrorImage(''); // Limpar mensagem de erro ao selecionar uma imagem
       }

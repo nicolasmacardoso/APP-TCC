@@ -1,8 +1,10 @@
-import React from 'react';
-import { View, StyleSheet, Text, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
-const FormInput = props => {
-  const { placeholder, label, error } = props;
+const FormInput = (props) => {
+  const { placeholder, label, error, secureTextEntry, eyeIcon, onEyePress, ...inputProps } = props;
+
   return (
     <>
       <View
@@ -17,10 +19,31 @@ const FormInput = props => {
           <Text style={{ color: 'red', fontSize: 16 }}>{error}</Text>
         ) : null}
       </View>
-      <TextInput {...props} placeholder={placeholder} style={styles.input} />
+      <View style={{ position: 'relative' }}>
+        <TextInput
+          {...inputProps}
+          placeholder={placeholder}
+          style={styles.input}
+          secureTextEntry={secureTextEntry} // Mantenha isso aqui
+        />
+        {secureTextEntry !== undefined && (
+          <TouchableOpacity
+            onPress={onEyePress} // Mantenha a chamada direta da propriedade onEyePress
+            style={{ position: 'absolute', right: 0, top: -10, padding: 15 }}
+          >
+            <FontAwesome
+              name={secureTextEntry ? 'eye-slash' : eyeIcon}
+              size={24}
+              color="black"
+            />
+          </TouchableOpacity>
+        )}
+      </View>
     </>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   input: {

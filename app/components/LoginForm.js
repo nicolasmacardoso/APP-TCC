@@ -78,24 +78,16 @@ const LoginForm = () => {
         placeholderTextColor="#A9A9A9"
       />
       <FormInput
-        value={senha}
-        onChangeText={(value) => handleOnChangeText(value, 'senha')}
-        label="Senha"
-        placeholder="Digite sua senha..."
-        autoCapitalize="none"
-        placeholderTextColor="#A9A9A9"
-        secureTextEntry={!showPassword}
-      />
-       <TouchableOpacity
-          onPress={() => setShowPassword(!showPassword)}
-          style={{ padding:10 }}
-        >
-          <FontAwesome
-            name={showPassword ? 'eye-slash' : 'eye'}
-            size={24}
-            color="black"
-          />
-        </TouchableOpacity>
+  value={senha}
+  onChangeText={(value) => handleOnChangeText(value, 'senha')}
+  label="Senha"
+  placeholder="Digite sua senha..."
+  autoCapitalize="none"
+  placeholderTextColor="#A9A9A9"
+  secureTextEntry={!showPassword}
+  eyeIcon={showPassword ? 'eye-slash' : 'eye'}
+  onEyePress={() => setShowPassword(!showPassword)}
+/>
       <FormSubmitButton onPress={submitForm} title="Entrar" />
     </FormContainer>
   );

@@ -3,11 +3,13 @@ import { View, ScrollView, StyleSheet, Text, Dimensions, Image, TouchableOpacity
 import * as ImagePicker from 'expo-image-picker';
 import { useLogin } from '../context/LoginProvider';
 import { FontAwesome } from '@expo/vector-icons'; 
+
 const windowWidth = Dimensions.get('window').width;
+
 const Perfil = () => {
-  const { profile } = useLogin();
-  const [profileImage, setProfileImage] = useState('');
-  const [userName, setUserName] = useState('Piscosin Da Silva');
+  const { profile, setProfile } = useLogin(); 
+  const [userName, setUserName] = useState('');
+  const [profileImage, setProfileImage] = useState(''); 
 
   const [posts, setPosts] = useState([
     { id: 1, content: 'Post 1 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/200/200', author: 'Alice' },
@@ -27,10 +29,26 @@ const Perfil = () => {
 
   useEffect(() => {
     if (profile) {
-      setUserName(profile.nome || 'Nome Padrão');
-      setProfileImage(profile.avatar || 'https://picwishhk.oss-cn-hongkong.aliyuncs.com/tasks/output/visual_background/3a47ff06-a426-415a-be0d-dcd7dca9edcf-image2.jpg?Expires=1700665367&OSSAccessKeyId=LTAI5tGjJnh66c1txANiRBQN&Signature=QK4HwxmhjizZ9TQL1RKIEhKaRMU%3D');
+      setUserName(profile.usuario || 'Nome Padrão');
     }
   }, [profile]);
+
+  const renderProfileImage = () => {
+    if (profile?.avatar) {
+      return (
+        <Image
+          source={{ uri: profile.avatar }}
+          style={{ width: 175, height: 175, borderRadius: 100, borderWidth: 5, borderColor: '#3E5481'}}
+        />
+      );
+    } else {
+      return (
+        <View style={{ width: 175, height: 175, borderRadius: 100, backgroundColor: '#FFFFFF', borderColor: '#3E5481', borderWidth: 4}}>
+          <FontAwesome name="user-circle" size={166.999} color="#757575" />
+        </View>
+      );
+    }
+  };
 
   const pickImage = async () => {
     try {
@@ -42,24 +60,29 @@ const Perfil = () => {
       });
   
       // Verifica se o usuário selecionou uma imagem
-      if (result.uri) {
-        setProfileImage(result.uri);
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        // Acesse a URI da primeira imagem selecionada
+        const selectedImageUri = result.assets[0].uri;
+  
+        // Atualiza a imagem do perfil no estado local
+        setProfileImage(selectedImageUri);
+  
+        // Atualiza a imagem do perfil no contexto global
+        setProfile({ ...profile, avatar: selectedImageUri });
       } else {
-        // Se não houver uma URI, utiliza a URL padrão
+        // Se não houver uma URI válida, utiliza a URL padrão
         setProfileImage('https://picwishhk.oss-cn-hongkong.aliyuncs.com/tasks/output/visual_background/3a47ff06-a426-415a-be0d-dcd7dca9edcf-image2.jpg?Expires=1700665367&OSSAccessKeyId=LTAI5tGjJnh66c1txANiRBQN&Signature=QK4HwxmhjizZ9TQL1RKIEhKaRMU%3D');
       }
     } catch (error) {
       Alert.alert('Erro ao selecionar a imagem', error.message);
     }
   };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileContainer}>
         <TouchableOpacity onPress={pickImage}>
-          <Image
-            source={{ uri: profileImage }}
-            style={styles.profileImage}
-          />
+          {renderProfileImage()}
         </TouchableOpacity>
         <Text style={styles.profileName}>{userName}</Text>
         <View style={styles.publicationsContainer}>
@@ -102,17 +125,7 @@ const formatTimeAgo = (timestamp) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFA500',
-  },
-  searchBar: {
-    padding: 16,
-    backgroundColor: '#FFA500',
-    elevation: 4,
-  },
-  searchInput: {
     backgroundColor: '#fff',
-    padding: 8,
-    borderRadius: 8,
   },
   profileContainer: {
     alignItems: 'center',
@@ -125,19 +138,12 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 200,
     resizeMode: 'cover',
-    borderWidth: 5, // Adicionado para criar uma borda
-    borderColor: '#76bbff', // Adicionado para definir a cor da borda
   },
   profileName: {
     marginTop: 8,
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#fff',
-  },
-  email: {
-    marginTop: 8,
-    fontSize: 18,
-    color: '#fff',
+    color: '#3E5481',
   },
   postContainer: {
     backgroundColor: '#fff',

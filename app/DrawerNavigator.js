@@ -10,6 +10,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import Home from './components/Home';
 import CriarPosts from './components/CriarPosts';
 import { useLogin } from './context/LoginProvider';
+import ChatPrincipal from './components/ChatPrincipal';
 
 const Drawer = createDrawerNavigator();
 
@@ -116,6 +117,7 @@ const DrawerNavigator = () => {
     >
       <Drawer.Screen component={Home} name='Home' />
       <Drawer.Screen component={CriarPosts} name='Criar Publicação' />
+      <Drawer.Screen component={ChatPrincipal} name='Bate-Papo' />
     </Drawer.Navigator>
   );
 };

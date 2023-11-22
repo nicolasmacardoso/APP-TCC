@@ -48,7 +48,7 @@ const LoginForm = () => {
           if (user.senha === userInfo.senha.trim()) {
             setUserInfo({ email: '', senha: '' });
 
-            login(user); // Chama a função de login do LoginProvider
+            login(user); 
             setIsLoggedIn(true);
           } else {
             updateError('Sua senha não condiz com seu email.', setError);

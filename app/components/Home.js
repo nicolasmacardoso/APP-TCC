@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 8,
     borderRadius: 8,
-    placeholderColor: '#343433',
   },
   postContainer: {
     backgroundColor: '#fff',

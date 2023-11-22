@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, Text, TextInput, Dimensions, Image } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons'; // ou import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -28,10 +29,14 @@ const App = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={{ ...styles.searchBar, marginTop: 60, marginBottom: 10 }}>
+      <View style={{ ...styles.searchBar, paddingTop: 70, marginBottom: 10 }}>
+        <View style={styles.searchIcon}>
+          <FontAwesome name="search" size={20} color="#000" />
+        </View>
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar..."
+          placeholderTextColor="#000"
         />
       </View>
       <View style={styles.postContainer}>
@@ -40,7 +45,7 @@ const App = () => {
             <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
             <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.content}</Text>
             <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)} • {post.author}</Text>
-          </View> 
+          </View>
         ))}
       </View>
     </ScrollView>
@@ -71,14 +76,20 @@ const formatTimeAgo = (timestamp) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFA500',
+    backgroundColor: '#fff',
   },
   searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
     backgroundColor: '#FFA500', // Laranja
     elevation: 4,
   },
+  searchIcon: {
+    marginRight: 10,
+  },
   searchInput: {
+    flex: 1,
     backgroundColor: '#fff',
     padding: 8,
     borderRadius: 8,

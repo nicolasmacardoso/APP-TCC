@@ -1,5 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, SafeAreaView, Alert, Modal,
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  SafeAreaView,
+  Alert,
+  Modal,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
@@ -14,7 +24,7 @@ function ChatPrincipal() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io('http://10.2.0.18:3000', {
+    socketRef.current = io('http://10.32.1.116:3000', {
       reconnection: true,
     });
 
@@ -35,6 +45,7 @@ function ChatPrincipal() {
       const newMessage = {
         text: message,
         isUserMessage: true,
+        // Adicione informações adicionais da mensagem, se necessário, como 'ip' e 'isReceivedImage'
       };
 
       socketRef.current.emit('chat message', newMessage);
@@ -95,6 +106,11 @@ function ChatPrincipal() {
     }
   };
 
+  const isReceivedImage = (message) => {
+    const currentUserIP = '10.32.1.116'; // IP do usuário atual
+    return message.ip !== currentUserIP && message.isReceivedImage;
+  };
+
   const handleLongPress = (message) => {
     setSelectedMessage(message);
     setModalVisible(true);
@@ -131,9 +147,14 @@ function ChatPrincipal() {
             style={[
               styles.messageContainer,
               item.isUserMessage ? styles.userMessageContainer : styles.receiverMessageContainer,
+              isReceivedImage(item) ? styles.receivedImageContainer : null,
             ]}
           >
-            <Text style={styles.messageText}>{item.text}</Text>
+            {isReceivedImage(item) ? (
+              <Image source={{ uri: item.imageURL }} style={styles.receivedImage} />
+            ) : (
+              <Text style={styles.messageText}>{item.text}</Text>
+            )}
             <Text style={styles.timestampText}>{item.timestamp}</Text>
           </TouchableOpacity>
         )}
@@ -198,11 +219,20 @@ const styles = StyleSheet.create({
   },
   userMessageContainer: {
     alignSelf: 'flex-end',
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#482334',
   },
   receiverMessageContainer: {
     alignSelf: 'flex-end',
     backgroundColor: '#EFEFEF',
+  },
+  receivedImageContainer: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#EFEFEF',
+  },
+  receivedImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
   },
   messageText: {
     fontSize: 16,

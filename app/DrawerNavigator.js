@@ -13,7 +13,6 @@ import { useLogin } from './context/LoginProvider';
 import ChatPrincipal from './components/ChatPrincipal';
 import UserProfile from './components/UserProfile';
 
-
 const Drawer = createDrawerNavigator();
 
 const CustomDrawer = (props) => {

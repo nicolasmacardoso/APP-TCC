@@ -15,6 +15,10 @@ const SignupForm = ({}) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [step, setStep] = useState(1);
   const [step1Data, setStep1Data] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const handleOnChangeText = (value, fieldName) => {
+    setUserInfo({ ...userInfo, [fieldName]: value });
+  };
 
   const validationSchema = Yup.object({
     nome: Yup.string().trim().required('Nome é obrigatório.'),
@@ -162,9 +166,11 @@ const SignupForm = ({}) => {
                     value={values.senha}
                     error={touched.senha && errors.senha}
                     onChangeText={handleChange('senha')}
-                    onBlur={handleBlur('senha')}
+                    secureTextEntry={!showPassword}
+                    eyeIcon={showPassword ? 'eye-slash' : 'eye'}
+                    onEyePress={() => setShowPassword(!showPassword)}
+                    onBlur={handleBlur('confirmSenha')}
                     autoCapitalize="none"
-                    secureTextEntry
                     label="Senha"
                     placeholder="Digite sua senha..."
                     placeholderTextColor="#A9A9A9"
@@ -173,9 +179,11 @@ const SignupForm = ({}) => {
                     value={values.confirmSenha}
                     error={touched.confirmSenha && errors.confirmSenha}
                     onChangeText={handleChange('confirmSenha')}
+                    secureTextEntry={!showPassword}
+                    eyeIcon={showPassword ? 'eye-slash' : 'eye'}
+                    onEyePress={() => setShowPassword(!showPassword)}
                     onBlur={handleBlur('confirmSenha')}
                     autoCapitalize="none"
-                    secureTextEntry
                     label="Confirme a Senha"
                     placeholder="Confirme sua senha..."
                     placeholderTextColor="#A9A9A9"

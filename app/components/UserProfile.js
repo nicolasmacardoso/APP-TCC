@@ -27,15 +27,22 @@ const Perfil = () => {
     { id: 12, content: 'Post 12', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/210/210', author: 'Leo' },
   ]);
 
+  const base64ToImage = (base64) => {
+    return `data:image/jpeg;base64,${base64}`;
+  };
+
   useEffect(() => {
     // Simulação de dados do perfil (substitua isso com sua lógica real)
     const profileData = {
       usuario: profile.usuario,
-      avatar: null, // Coloque a URL padrão da imagem do perfil aqui, se houver
+      avatar: profile.imagem,
     };
 
+    console.log(profileImage, 'oiii')
+
     setUserName(profileData.usuario);
-    setProfileImage(profileData.avatar);
+    setProfileImage(base64ToImage(profileData.avatar));
+
   }, []);
 
   const renderProfileImage = () => {
@@ -89,7 +96,7 @@ const Perfil = () => {
 
       const result = await ImagePicker.launchImageLibraryAsync(options);
 
-      if (!result.cancelled && result.assets && result.assets.length > 0) {
+      if (!result.canceled && result.assets && result.assets.length > 0) {
         const selectedImageUri = result.assets[0].uri;
 
         // Converter a imagem para base64
@@ -97,7 +104,17 @@ const Perfil = () => {
 
         console.log(base64Image)
         // Enviar a imagem para o servidor usando axios
-        const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}`, { imagem: base64Image });
+        const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}`, 
+        { imagem: base64Image,
+          nome: profile.nome,  // Substitua userName pelo valor real
+          usuario: userName,
+          senha: profile.senha,  // Substitua profile.senha pelo valor real
+          email: profile.email,  // Substitua profile.email pelo valor real
+          cpf: profile.cpf,  // Substitua profile.cpf pelo valor real
+          numero_casa: profile.numero_casa,  // Substitua profile.numero_casa pelo valor real
+          rua: profile.rua,  // Substitua profile.rua pelo valor real
+          complemento: profile.complemento,  // Substitua profile.complemento pelo valor real
+          codbairro: profile.codbairro, });
 
         if (response.status === 200) {
           setProfile(prevProfile => ({ ...prevProfile, avatar: selectedImageUri }));

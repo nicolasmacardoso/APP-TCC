@@ -6,6 +6,7 @@ const LoginContext = createContext();
 const LoginProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profile, setProfile] = useState({});
+  const [profileImagem, setProfileImagem] = useState({});
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null); 
 
@@ -37,6 +38,7 @@ const LoginProvider = ({ children }) => {
 
       setProfile(user);
       setUserId(user.id); // Armazene o ID do usuário
+      setProfileImagem(user.imagem)
       setIsLoggedIn(true);
 
       console.log('Usuário logado:', user);
@@ -53,6 +55,7 @@ const LoginProvider = ({ children }) => {
 
       setProfile({});
       setUserId(null); // Limpe o ID do usuário
+      setProfileImagem(null);
       setIsLoggedIn(false);
     } catch (e) {
       console.error('Erro ao remover usuário do AsyncStorage:', e);
@@ -61,7 +64,7 @@ const LoginProvider = ({ children }) => {
 
   return (
     <LoginContext.Provider
-      value={{ isLoggedIn, setIsLoggedIn, profile, setProfile, login, logout, loading, userId }}
+      value={{ isLoggedIn, setIsLoggedIn, profile, setProfile, profileImagem, setProfileImagem, login, logout, loading, userId }}
     >
       {children}
     </LoginContext.Provider>

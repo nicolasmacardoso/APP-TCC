@@ -15,8 +15,9 @@ const LoginProvider = ({ children }) => {
         const storedUser = await AsyncStorage.getItem('@user');
 
         if (storedUser) {
-          setProfile(JSON.parse(storedUser));
-          setUserId(parsedUser.id); // Armazene o ID do usuário
+          const parsedUser = JSON.parse(storedUser);
+          setProfile(parsedUser);
+          setUserId(parsedUser.id);
           setIsLoggedIn(true);
         }
       } catch (e) {

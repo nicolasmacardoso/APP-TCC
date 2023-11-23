@@ -8,10 +8,10 @@ import axios from 'axios';
 const windowWidth = Dimensions.get('window').width;
 
 const Perfil = () => {
-  const { profile, setProfile, userId } = useLogin(); 
+  const { profile, setProfile, userId } = useLogin();
   const [userName, setUserName] = useState('');
-  const [profileImage, setProfileImage] = useState(''); 
-
+  const [profileImage, setProfileImage] = useState('');
+  
   const [posts, setPosts] = useState([
     { id: 1, content: 'Post 1 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/200/200', author: 'Alice' },
     { id: 2, content: 'Post 2', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/201/201', author: 'Bob' },
@@ -25,7 +25,6 @@ const Perfil = () => {
     { id: 10, content: 'Post 10', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/209/209', author: 'Jack' },
     { id: 11, content: 'Post 11', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/210/210', author: 'Karen' },
     { id: 12, content: 'Post 12', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/210/210', author: 'Leo' },
-    // Adicione mais postagens conforme necessário
   ]);
 
   useEffect(() => {
@@ -56,39 +55,56 @@ const Perfil = () => {
     }
   };
 
+  const convertImageToBase64 = async (uri) => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => {
+          resolve(reader.result.split(",")[1]);
+        };
+        reader.readAsDataURL(blob);
+      });
+      return base64;
+    } catch (error) {
+      console.error('Erro ao converter imagem para base64:', error);
+      throw error;
+    }
+  };
+
   const pickImage = async () => {
     try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      const options = {
+        mediaType: 'photo',
+        quality: 1,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 1,
-      });
+        storageOptions: {
+          skipBackup: true,
+          path: 'images',
+        },
+      };
 
-      if (!result.canceled && result.assets && result.assets.length > 0) {
+      const result = await ImagePicker.launchImageLibraryAsync(options);
+
+      if (!result.cancelled && result.assets && result.assets.length > 0) {
         const selectedImageUri = result.assets[0].uri;
 
-        // Criar um objeto FormData para enviar a imagem como parte do corpo da requisição
-        const formData = new FormData();
-        formData.append('imagem', {
-          uri: selectedImageUri,
-          type: 'image/jpeg', // Altere para o tipo de arquivo correto
-          name: 'avatar.jpg',
-        });
+        // Converter a imagem para base64
+        const base64Image = await convertImageToBase64(selectedImageUri);
 
+        console.log(base64Image)
         // Enviar a imagem para o servidor usando axios
-        const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}/imagem`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}`, { imagem: base64Image });
 
         if (response.status === 200) {
+          setProfile(prevProfile => ({ ...prevProfile, avatar: selectedImageUri }));
           setProfileImage(selectedImageUri);
-          profile.avatar = selectedImageUri;
           Alert.alert('Imagem atualizada com sucesso!');
         } else {
-          Alert.alert('Erro ao enviar a imagem', 'A imagem não pôde ser enviada.');
+          Alert.alert('Erro ao enviar a imagem', 'A imagem não pôde ser enviada.');        
         }
       }
     } catch (error) {

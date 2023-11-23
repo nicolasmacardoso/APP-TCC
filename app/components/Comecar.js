@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   },
   tagline: {
     color: '#304269', // Cor do texto da frase
-    fontSize: 22,
+    fontSize: 24,
     textAlign: 'center',
     marginBottom: 30, // Adicionado espaço abaixo da frase
     marginTop: -5,

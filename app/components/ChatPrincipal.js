@@ -10,8 +10,7 @@ import {
   Alert,
   Modal,
   Image,
-  KeyboardAvoidingView, 
-  Platform, 
+  KeyboardAvoidingView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
@@ -26,7 +25,7 @@ function ChatPrincipal() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io('http:/10.27.0.9:3000', {
+    socketRef.current = io('http://10.32.3.108:3000', {
       reconnection: true,
     });
 
@@ -43,8 +42,6 @@ function ChatPrincipal() {
   }, []);
 
   const sendMessage = () => {
-    console.log('Tentativa de enviar mensagem:', message);
-  
     if (message.trim() !== '') {
       const newMessage = {
         text: message,
@@ -53,12 +50,9 @@ function ChatPrincipal() {
       };
 
       socketRef.current.emit('chat message', newMessage);
-    setMessage('');
-    console.log('Mensagem enviada com sucesso:', newMessage);
-  } else {
-    console.log('A mensagem está vazia. Não enviando.');
-  }
-};
+      setMessage('');
+    }
+  };
 
   const clearMessagesLocally = async () => {
     if (messages.length === 0) {
@@ -139,11 +133,10 @@ function ChatPrincipal() {
 
   return (
     <KeyboardAvoidingView
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    style={styles.container}
-    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -100}  // Ajuste o valor conforme necessário
-  >
-      <SafeAreaView style={styles.container}>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={clearMessagesLocally}>
           <Icon name="trash" size={24} color="black" style={styles.trashIcon} />
@@ -194,7 +187,7 @@ function ChatPrincipal() {
           <Text style={styles.sendButtonText}>Enviar</Text>
         </TouchableOpacity>
       </View>
-      </SafeAreaView>
+    </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
@@ -223,7 +216,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   messageContainer: {
-    backgroundColor: '#DCF8C6',
+    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 8,
     marginBottom: 8,
@@ -232,7 +225,7 @@ const styles = StyleSheet.create({
   },
   userMessageContainer: {
     alignSelf: 'flex-end',
-    backgroundColor: '#482334',
+    backgroundColor: '#cccccc',
   },
   receiverMessageContainer: {
     alignSelf: 'flex-end',

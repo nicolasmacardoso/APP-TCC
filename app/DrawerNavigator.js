@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import {
   createDrawerNavigator,
@@ -17,13 +17,31 @@ const Drawer = createDrawerNavigator();
 
 const CustomDrawer = (props) => {
   const { setIsLoggedIn, profile } = useLogin();
+  const [profileImage, setProfileImage] = useState('');
+
+
+const base64ToImage = (base64) => {
+    return `data:image/jpeg;base64,${base64}`;
+  };
+
+  useEffect(() => {
+    // Simulação de dados do perfil (substitua isso com sua lógica real)
+    const profileData = {
+      avatar: profile.imagem,
+    };
+
+    console.log(profileImage, 'oiii')
+
+    setProfileImage(base64ToImage(profileData.avatar));
+
+  }, []);
 
   const renderProfileImage = () => {
-    if (profile?.avatar) {
+    if (profileImage) {
       return (
         <Image
-          source={{ uri: profile.avatar }}
-          style={{ width: 80, height: 80, borderRadius: 100 }}
+          source={{ uri: profileImage }}
+          style={{ width: 80, height: 80, borderRadius: 100, borderWidth: 5, borderColor: '#3E5481' }}
         />
       );
     } else {

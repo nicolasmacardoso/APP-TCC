@@ -38,8 +38,6 @@ const Perfil = () => {
       avatar: profile.imagem,
     };
 
-    console.log(profileImage, 'oiii')
-
     setUserName(profileData.usuario);
     setProfileImage(base64ToImage(profileData.avatar));
 

@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, Keyboard} from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { FontAwesome } from '@expo/vector-icons';
 
 import BairroSelect from './BairroSelect';
 import FormContainer from './FormContainer';
@@ -114,29 +115,23 @@ const SignupForm = ({}) => {
                   <FormInput
                     value={values.nome}
                     error={touched.nome && errors.nome}
+                    icon = 'address-card'
                     onChangeText={handleChange('nome')}
                     onBlur={handleBlur('nome')}
-                    label="Nome Completo"
-                    placeholder="Digite seu nome completo..."
+                    placeholder="Nome Completo."
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.usuario}
                     error={touched.usuario && errors.usuario}
+                    icon = 'user'
                     onChangeText={handleChange('usuario')}
                     onBlur={handleBlur('usuario')}
-                    label="Nome de Usuário"
-                    placeholder="Digite seu nome de usuário..."
+                    placeholder="Usuario"
                     placeholderTextColor="#A9A9A9"
                   />
                   <View style={styles.labelContainer}>
-                    <Text style={styles.label}>CPF</Text>
                   </View>
-                  {touched.cpf && errors.cpf && (
-                    <Text style={{ color: 'red', fontSize: 16, textAlign: 'right',marginTop: -30, marginBottom: 10.5,}}>
-                      {errors.cpf}
-                    </Text>
-                  )}
                   <TextInputMask
                     type={'cpf'}
                     options={{
@@ -148,44 +143,53 @@ const SignupForm = ({}) => {
                     onChangeText={(text) => handleChange('cpf')(text.replace(/\D/g, ''))}
                     onBlur={handleBlur('cpf')}
                     style={styles.input}
-                    placeholder="Digite seu CPF..."
+                    placeholder="CPF"
                     placeholderTextColor="#A9A9A9"
                     keyboardType="numeric"
                   />
+                  <View style={styles.iconContainer}>
+                    <FontAwesome
+                      name={'file-text'}
+                      size={22}
+                      color="#2E3E5C"
+                    />
+                  </View>
+
+                  {touched.cpf && errors.cpf && (
+                    <Text style={{ color: 'red', fontSize: 16, textAlign: 'left',marginTop: -15, marginBottom: 10, marginLeft: 20,}}>
+                      {errors.cpf}
+                    </Text>
+                  )}
                   <FormInput
                     value={values.email}
                     error={touched.email && errors.email}
+                    icon = 'envelope'
                     onChangeText={handleChange('email')}
                     onBlur={handleBlur('email')}
                     autoCapitalize="none"
-                    label="E-mail"
-                    placeholder="Digite seu e-mail..."
+                    placeholder="Email"
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.senha}
                     error={touched.senha && errors.senha}
+                    icon = 'key'
                     onChangeText={handleChange('senha')}
-                    secureTextEntry={!showPassword}
-                    eyeIcon={showPassword ? 'eye-slash' : 'eye'}
-                    onEyePress={() => setShowPassword(!showPassword)}
-                    onBlur={handleBlur('confirmSenha')}
+                    secureTextEntry
+                    onBlur={handleBlur('senha')}
                     autoCapitalize="none"
-                    label="Senha"
-                    placeholder="Digite sua senha..."
+                    placeholder="Senha"
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.confirmSenha}
                     error={touched.confirmSenha && errors.confirmSenha}
+                    icon = 'key'
                     onChangeText={handleChange('confirmSenha')}
-                    secureTextEntry={!showPassword}
-                    eyeIcon={showPassword ? 'eye-slash' : 'eye'}
-                    onEyePress={() => setShowPassword(!showPassword)}
+                    secureTextEntry
                     onBlur={handleBlur('confirmSenha')}
                     autoCapitalize="none"
-                    label="Confirme a Senha"
-                    placeholder="Confirme sua senha..."
+                    placeholder="Confirmar senha"
                     placeholderTextColor="#A9A9A9"
                   />
                 </>
@@ -197,7 +201,6 @@ const SignupForm = ({}) => {
                     error={touched.rua && errors.rua}
                     onChangeText={handleChange('rua')}
                     onBlur={handleBlur('rua')}
-                    label="Endereço"
                     placeholder="Digite seu endereço..."
                     placeholderTextColor="#A9A9A9"
                   />
@@ -206,7 +209,6 @@ const SignupForm = ({}) => {
                     error={touched.complemento && errors.complemento}
                     onChangeText={handleChange('complemento')}
                     onBlur={handleBlur('complemento')}
-                    label="Complemento(Opcional)"
                     placeholder="Digite o complemento..."
                     placeholderTextColor="#A9A9A9"
                   />
@@ -215,14 +217,12 @@ const SignupForm = ({}) => {
                     error={touched.numero_casa && errors.numero_casa}
                     onChangeText={handleChange('numero_casa')}
                     onBlur={handleBlur('numero_casa')}
-                    label="Número"
                     placeholder="Digite o número..."
                     placeholderTextColor="#A9A9A9"
                   />
                    <BairroSelect
                     value={values.codbairro}
                     onValueChange={handleChange('codbairro')}
-                    label="Bairro"
                     placeholder="Selecione o bairro..."
                   />
                 </>
@@ -255,20 +255,18 @@ const SignupForm = ({}) => {
 const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
-    borderColor: '#1b1b33',
-    height: 35,
-    borderRadius: 8,
+    borderColor: '#A8B3C5',
+    height: 60,
+    borderRadius: 50,
     fontSize: 16,
-    paddingLeft: 10,
+    paddingLeft: 60,
     marginBottom: 20,
+    marginTop: 15,
   },
-  labelContainer: {
-    marginBottom: 5,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'black', // ou a cor desejada
+  iconContainer: {
+    position: 'absolute',
+    left: 25, 
+    top: '34%',
   },
 });
 

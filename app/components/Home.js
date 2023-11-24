@@ -1,77 +1,92 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Text, TextInput, Dimensions, Image } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons'; // ou import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import React, { useState, useEffect } from 'react';
+import {Animated, View, ScrollView, StyleSheet, Text, TextInput, Dimensions, Image, Platform } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import axios from 'axios';
 
 const windowWidth = Dimensions.get('window').width;
 
 const App = () => {
-  const [posts, setPosts] = useState([
-    { id: 1, content: 'Post 1 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/200/200', author: 'Alice' },
-    { id: 2, content: 'Post 2', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/201/201', author: 'Bob' },
-    { id: 3, content: 'Post 3 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/202/202', author: 'Charlie' },
-    { id: 4, content: 'Post 4', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/203/203', author: 'David' },
-    { id: 5, content: 'Post 5 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/204/204', author: 'Eva' },
-    { id: 6, content: 'Post 6', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/205/205', author: 'Frank' },
-    { id: 7, content: 'Post 7 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/206/206', author: 'Grace' },
-    { id: 8, content: 'Post 8', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/207/207', author: 'Henry' },
-    { id: 9, content: 'Post 9 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/208/208', author: 'Ivy' },
-    { id: 10, content: 'Post 10', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/209/209', author: 'Jack' },
-    { id: 11, content: 'Post 9 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/208/208', author: 'Ivy' },
-    { id: 12, content: 'Post 10', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/209/209', author: 'Jack' },
-    { id: 13, content: 'Post 6', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/205/205', author: 'Frank' },
-    { id: 14, content: 'Post 7 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/206/206', author: 'Grace' },
-    { id: 15, content: 'Post 8', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/207/207', author: 'Henry' },
-    { id: 16, content: 'Post 9 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/208/208', author: 'Ivy' },
-    { id: 17, content: 'Post 10', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/209/209', author: 'Jack' },
-    { id: 18, content: 'Post 9 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/208/208', author: 'Ivy' },
-    { id: 19, content: 'Post 10', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/209/209', author: 'Jack' },
-  ]);
+  const [posts, setPosts] = useState([]);
+  const [scrollY, setScrollY] = useState(new Animated.Value(0));
+
+  useEffect(() => {
+    // Chamada à API para buscar as postagens
+    axios.get('https://cima-production.up.railway.app/postagem/posts')
+      .then(response => setPosts(response.data))
+      .catch(error => console.error('Erro ao buscar postagens:', error));
+  }, []); // O array vazio garante que o useEffect seja executado apenas uma vez, equivalente ao componentDidMount
+
+  const decodeBase64Image = (base64String) => {
+    const binaryString = atob(base64String);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const imageBlob = new Blob([bytes], { type: 'image/jpeg' }); // Altere o tipo conforme necessário
+    const imageUrl = URL.createObjectURL(imageBlob);
+    return imageUrl;
+  };
+
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const postTime = new Date(timestamp);
+    const timeDiff = now - postTime;
+
+    // Convert timeDiff to minutes
+    const minutes = Math.floor(timeDiff / (1000 * 60));
+
+    if (minutes < 60) {
+      return `${minutes} min ago`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) {
+        return `${hours}h ago`;
+      } else {
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+      }
+    }
+  };
+
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, 50], // Ou qualquer valor desejado
+    outputRange: [70, 20],
+    extrapolate: 'clamp',
+  });
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={{ ...styles.searchBar, paddingTop: 70, marginBottom: 10 }}>
-        <View style={styles.searchIcon}>
-          <FontAwesome name="search" size={20} color="#000" />
-        </View>
+    <View style={styles.container}>
+      <Animated.View style={{ ...styles.searchBar, paddingTop: headerHeight }}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Buscar..."
-          placeholderTextColor="#000"
+          placeholder="Pesquisa"
+          placeholderTextColor="#8E94AF"
         />
-      </View>
-      <View style={styles.postContainer}>
-        {posts.map((post) => (
-          <View key={post.id} style={styles.post}>
-            <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
-            <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.content}</Text>
-            <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)} • {post.author}</Text>
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+        <View style={styles.searchIcon}>
+          <FontAwesome name="search" size={20} color="#304269" />
+        </View>
+      </Animated.View>
+      <ScrollView
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+      >
+        <View style={styles.postContainer}>
+          {posts.map((post) => (
+            <View key={post.id} style={styles.post}>
+              <Image source={{ uri: decodeBase64Image(post.imageUrl) }} style={styles.postImage} />
+              <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.content}</Text>
+              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)} • {post.author}</Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
-const formatTimeAgo = (timestamp) => {
-  const now = new Date();
-  const postTime = new Date(timestamp);
-  const timeDiff = now - postTime;
-
-  // Convert timeDiff to minutes
-  const minutes = Math.floor(timeDiff / (1000 * 60));
-
-  if (minutes < 60) {
-    return `${minutes} min ago`;
-  } else {
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-      return `${hours}h ago`;
-    } else {
-      const days = Math.floor(hours / 24);
-      return `${days}d ago`;
-    }
-  }
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -81,18 +96,22 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#FFA500', // Laranja
-    elevation: 4,
+    padding: 50,
+    backgroundColor: '#304269',
+    paddingTop: 125,
   },
   searchIcon: {
-    marginRight: 10,
+    position: 'absolute',
+    left: 70,
+    top: 89,
   },
   searchInput: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 8,
-    borderRadius: 8,
+    fontSize: 20,
+    height: 60,
+    borderRadius: 50,
+    paddingLeft: 60,
   },
   postContainer: {
     backgroundColor: '#fff',

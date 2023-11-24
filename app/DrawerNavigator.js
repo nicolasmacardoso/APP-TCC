@@ -86,7 +86,7 @@ const CustomDrawer = (props) => {
     });
     const truncatedName = filteredWords.join(' ');
 
-    return truncatedName.substring(0, maxLength);
+    return truncatedName.substring(0, maxLength) + '...';
   };
 
   return (
@@ -104,8 +104,8 @@ const CustomDrawer = (props) => {
         >
           {renderProfileImage()}
           <View>
-            <Text>{truncateName(profile?.nome || '', 20, ['de', 'da', 'das', 'dos', 'do'])}</Text>
-            <Text>{truncateString(profile?.email || '', 20)}</Text>
+            <Text>{truncateName(profile?.nome || '', 18, ['de', 'da', 'das', 'dos', 'do'])}</Text>
+            <Text>{truncateString(profile?.email || '', 18)}</Text>
           </View>
         </View>
         <DrawerItemList {...props} />
@@ -116,12 +116,12 @@ const CustomDrawer = (props) => {
           right: 0,
           left: 0,
           bottom: 50,
-          backgroundColor: '#FAB550',
+          backgroundColor: '#304269',
           padding: 20,
         }}
         onPress={() => setIsLoggedIn(false)}
       >
-        <Text>Sair</Text>
+        <Text  style={{fontSize: 20,}}>Sair</Text>
       </TouchableOpacity>
     </View>
   );

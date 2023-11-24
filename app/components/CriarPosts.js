@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useId } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -29,8 +29,6 @@ const CreatePostScreen = () => {
 
   const { userId } = useLogin();
 
-
-  console.log(userId)
   useEffect(() => {
     (async () => {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -39,6 +37,23 @@ const CreatePostScreen = () => {
       }
     })();
   }, []);
+
+  const convertImageToBase64 = async (imageUri) => {
+    try {
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      return base64;
+    } catch (error) {
+      console.error('Erro ao converter imagem para base64:', error);
+      throw error;
+    }
+  };
 
   const handleCreatePost = async () => {
     // Verificar se os campos obrigatórios foram preenchidos
@@ -66,11 +81,13 @@ const CreatePostScreen = () => {
     }
 
     try {
+      const isBase64 = imagem.startsWith('data:image');
+      const imageData = isBase64 ? imagem : await convertImageToBase64(imagem);
       // Criar um objeto com os dados da postagem
       const postData = {
         titulo: titulo,
         descricao: descricao,
-        imagem: imagem,
+        imagem: imageData,
         codusuario: userId,
       };
 

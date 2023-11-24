@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; // Certifique-se de importar o ícone necessário
 import client from '../api/client';
 import { useLogin } from '../context/LoginProvider';
@@ -61,7 +61,7 @@ const LoginForm = () => {
     }
   };
 
-  return (
+  return (   
     <FormContainer>
       {error ? (
         <Text style={{ color: 'red', fontSize: 18, textAlign: 'center', marginBottom: 10 }}>
@@ -71,16 +71,15 @@ const LoginForm = () => {
       <FormInput
         value={email}
         onChangeText={(value) => handleOnChangeText(value, 'email')}
-        label="Email"
-        placeholder="Digite seu email..."
+        placeholder="Email"
         autoCapitalize="none"
         placeholderTextColor="#A9A9A9"
+        icon="envelope-o" // Ícone para o campo de email
       />
       <FormInput
         value={senha}
         onChangeText={(value) => handleOnChangeText(value, 'senha')}
-        label="Senha"
-        placeholder="Digite sua senha..."
+        placeholder="Senha"
         autoCapitalize="none"
         placeholderTextColor="#A9A9A9"
         secureTextEntry={!showPassword}

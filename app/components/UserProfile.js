@@ -5,10 +5,8 @@ import { useLogin } from '../context/LoginProvider';
 import { FontAwesome } from '@expo/vector-icons'; 
 import axios from 'axios';
 
-const windowWidth = Dimensions.get('window').width;
-
 const Perfil = () => {
-  const { profile, setProfile, userId } = useLogin();
+  const { profile, userId, registerProfileImageCallback, profileImageCallback } = useLogin();
   const [userName, setUserName] = useState('');
   const [profileImage, setProfileImage] = useState('');
   
@@ -32,15 +30,26 @@ const Perfil = () => {
   };
 
   useEffect(() => {
-    // Simulação de dados do perfil (substitua isso com sua lógica real)
     const profileData = {
       usuario: profile.usuario,
       avatar: profile.imagem,
     };
-
+  
     setUserName(profileData.usuario);
     setProfileImage(base64ToImage(profileData.avatar));
+  }, [profile]);
+  
 
+  useEffect(() => {
+    const callback = (newImage) => {
+      setProfileImage(base64ToImage(newImage));
+    };
+    
+    registerProfileImageCallback(callback);    
+
+    return () => {
+      registerProfileImageCallback(null);
+    };
   }, []);
 
   const renderProfileImage = () => {
@@ -97,26 +106,30 @@ const Perfil = () => {
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const selectedImageUri = result.assets[0].uri;
 
-        // Converter a imagem para base64
         const base64Image = await convertImageToBase64(selectedImageUri);
 
-        console.log(base64Image)
-        // Enviar a imagem para o servidor usando axios
         const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}`, 
-        { imagem: base64Image,
-          nome: profile.nome,  // Substitua userName pelo valor real
+        { 
+          imagem: base64Image,
+          nome: profile.nome,
           usuario: userName,
-          senha: profile.senha,  // Substitua profile.senha pelo valor real
-          email: profile.email,  // Substitua profile.email pelo valor real
-          cpf: profile.cpf,  // Substitua profile.cpf pelo valor real
-          numero_casa: profile.numero_casa,  // Substitua profile.numero_casa pelo valor real
-          rua: profile.rua,  // Substitua profile.rua pelo valor real
-          complemento: profile.complemento,  // Substitua profile.complemento pelo valor real
-          codbairro: profile.codbairro, });
+          senha: profile.senha,
+          email: profile.email,
+          cpf: profile.cpf,
+          numero_casa: profile.numero_casa,
+          rua: profile.rua,
+          complemento: profile.complemento,
+          codbairro: profile.codbairro,
+        });
 
         if (response.status === 200) {
-          setProfile(prevProfile => ({ ...prevProfile, avatar: selectedImageUri }));
           setProfileImage(selectedImageUri);
+    
+          // Chame o callback após a atualização da imagem
+          if (profileImageCallback) {
+            profileImageCallback(base64Image);
+          }
+    
           Alert.alert('Imagem atualizada com sucesso!');
         } else {
           Alert.alert('Erro ao enviar a imagem', 'A imagem não pôde ser enviada.');        

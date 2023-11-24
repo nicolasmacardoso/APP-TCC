@@ -9,13 +9,13 @@ import {
 } from 'react-native';
 
 const FormContainer = ({ children }) => {
-  return (
+  return ( 
     <KeyboardAvoidingView
       enabled
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // Alterado para 'height' para Android
       style={styles.container}
       keyboardVerticalOffset={260} // Ajuste este valor conforme necessário
-    >
+    > 
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"

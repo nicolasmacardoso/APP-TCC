@@ -8,7 +8,8 @@ const LoginProvider = ({ children }) => {
   const [profile, setProfile] = useState({});
   const [profileImagem, setProfileImagem] = useState({});
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null); 
+  const [userId, setUserId] = useState(null);
+  const [profileImageCallback, setProfileImageCallback] = useState(null);
 
   useEffect(() => {
     const loadUserFromStorage = async () => {
@@ -19,6 +20,7 @@ const LoginProvider = ({ children }) => {
           const parsedUser = JSON.parse(storedUser);
           setProfile(parsedUser);
           setUserId(parsedUser.id);
+          setProfileImagem(parsedUser.imagem);
           setIsLoggedIn(true);
         }
       } catch (e) {
@@ -33,16 +35,17 @@ const LoginProvider = ({ children }) => {
 
   const login = async (user) => {
     try {
-      // Adiciona lógica para armazenar o usuário no AsyncStorage
       await AsyncStorage.setItem('@user', JSON.stringify(user));
 
       setProfile(user);
-      setUserId(user.id); // Armazene o ID do usuário
-      setProfileImagem(user.imagem)
+      setUserId(user.id);
+      setProfileImagem(user.imagem);
+
+      if (profileImageCallback) {
+        profileImageCallback(user.imagem);
+      }
+
       setIsLoggedIn(true);
-
-      console.log('Usuário logado:', user);
-
     } catch (e) {
       console.error('Erro ao salvar usuário no AsyncStorage:', e);
     }
@@ -50,11 +53,10 @@ const LoginProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Adiciona lógica para remover o usuário do AsyncStorage ao sair
       await AsyncStorage.removeItem('@user');
 
       setProfile({});
-      setUserId(null); // Limpe o ID do usuário
+      setUserId(null);
       setProfileImagem(null);
       setIsLoggedIn(false);
     } catch (e) {
@@ -62,9 +64,25 @@ const LoginProvider = ({ children }) => {
     }
   };
 
+  const registerProfileImageCallback = (callback) => {
+    setProfileImageCallback(() => callback);
+  };  
+
   return (
     <LoginContext.Provider
-      value={{ isLoggedIn, setIsLoggedIn, profile, setProfile, profileImagem, setProfileImagem, login, logout, loading, userId }}
+      value={{
+        isLoggedIn,
+        setIsLoggedIn,
+        profile,
+        setProfile,
+        profileImagem,
+        setProfileImagem,
+        login,
+        logout,
+        loading,
+        userId,
+        registerProfileImageCallback,
+      }}
     >
       {children}
     </LoginContext.Provider>

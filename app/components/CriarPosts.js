@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import {
   View,
   StyleSheet,
@@ -15,16 +15,22 @@ import {
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import axios from 'axios';
+import {useLogin} from '../context/LoginProvider'; // Certifique-se de importar corretamente o contexto
 
 const CreatePostScreen = () => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [imageUri, setImageUri] = useState('');
+  const [titulo, settitulo] = useState('');
+  const [descricao, setDescricao] = useState('');
+  const [imagem, setImagem] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [errorImage, setErrorImage] = useState('');
-  const [errorTitle, setErrorTitle] = useState('');
-  const [errorContent, setErrorContent] = useState('');
+  const [errortitulo, setErrortitulo] = useState('');
+  const [errorDescricao, setErrorDescricao] = useState('');
 
+  const { userId } = useLogin();
+
+
+  console.log(userId)
   useEffect(() => {
     (async () => {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -34,45 +40,63 @@ const CreatePostScreen = () => {
     })();
   }, []);
 
-  const handleCreatePost = () => {
+  const handleCreatePost = async () => {
     // Verificar se os campos obrigatórios foram preenchidos
-    if (!imageUri) {
+    if (!imagem) {
       setErrorImage('Selecione uma imagem para a publicação');
     } else {
       setErrorImage('');
     }
 
-    if (!title) {
-      setErrorTitle('Preencha o campo de título.');
+    if (!titulo) {
+      setErrortitulo('Preencha o campo de título.');
     } else {
-      setErrorTitle('');
+      setErrortitulo('');
     }
 
-    if (!content) {
-      setErrorContent('Preencha o campo de descrição.');
+    if (!descricao) {
+      setErrorDescricao('Preencha o campo de descrição.');
     } else {
-      setErrorContent('');
+      setErrorDescricao('');
     }
 
     // Verificar se algum dos campos está vazio
-    if (!imageUri || !title || !content) {
+    if (!imagem || !titulo || !descricao) {
       return;
     }
 
-    // Lógica para criar o post (simulação de sucesso)
-    console.log('Simulação de post criado com sucesso:', { title, content, imageUri });
+    try {
+      // Criar um objeto com os dados da postagem
+      const postData = {
+        titulo: titulo,
+        descricao: descricao,
+        imagem: imagem,
+        codusuario: userId,
+      };
 
-    // Exibir o modal de feedback
-    setModalVisible(true);
+      // Enviar a postagem para o servidor usando a API
+      const response = await axios.post('https://cima-production.up.railway.app/postagem', postData);
 
-    // Limpar os campos após a criação do post
-    setTitle('');
-    setContent('');
-    setImageUri('');
-    setErrorImage('');
-    setErrorTitle('');
-    setErrorContent('');
+      // Verificar se a postagem foi criada com sucesso
+      if (response.status === 201) {
+        // Exibir o modal de feedback
+        setModalVisible(true);
+
+        // Limpar os campos após a criação do post
+        settitulo('');
+        setDescricao('');
+        setImagem('');
+        setErrorImage('');
+        setErrortitulo('');
+        setErrorDescricao('');
+      } else {
+        console.error('Erro ao criar postagem:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Erro ao criar postagem:', error);
+    }
   };
+
 
   const pickImage = async () => {
     try {
@@ -84,8 +108,8 @@ const CreatePostScreen = () => {
       });
 
       if (!result.canceled) {
-        setImageUri(result.uri);
-        setErrorImage(''); // Limpar mensagem de erro ao selecionar uma imagem
+        setImagem(result.uri);
+        setErrorImage(''); 
       }
     } catch (error) {
       console.error('Erro ao escolher imagem da galeria:', error);
@@ -107,14 +131,14 @@ const CreatePostScreen = () => {
         extraScrollHeight={Platform.select({ ios: 50, android: 0 })}
         enableOnAndroid
       >
-        <Text style={styles.title}>Criar Publicação</Text>
+        <Text style={styles.titulo}>Criar Publicação</Text>
 
         <View style={styles.formContainer}>
           <View style={styles.imageContainer}>
             <Text style={styles.label}>Capa:</Text>
             <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-              {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.previewImage} />
+              {imagem ? (
+                <Image source={{ uri: imagem }} style={styles.previewImage} />
               ) : (
                 <>
                   <AntDesign name="picture" size={40} color="#FFA500" />
@@ -127,16 +151,16 @@ const CreatePostScreen = () => {
 
           <Text style={styles.label}>Título:</Text>
           <TextInput
-            style={styles.titleInput}
+            style={styles.tituloInput}
             placeholder="Digite o título..."
             placeholderTextColor="#ccc"
-            value={title}
+            value={titulo}
             onChangeText={(text) => {
-              setTitle(text);
-              setErrorTitle(''); // Limpar mensagem de erro ao digitar no campo
+              settitulo(text);
+              setErrortitulo(''); 
             }}
           />
-          {errorTitle ? <Text style={styles.errorText}>{errorTitle}</Text> : null}
+          {errortitulo ? <Text style={styles.errorText}>{errortitulo}</Text> : null}
 
           <Text style={styles.label}>Descrição:</Text>
           <TextInput
@@ -145,13 +169,13 @@ const CreatePostScreen = () => {
             placeholderTextColor="#ccc"
             multiline
             numberOfLines={4}
-            value={content}
+            value={descricao}
             onChangeText={(text) => {
-              setContent(text);
-              setErrorContent(''); // Limpar mensagem de erro ao digitar no campo
+              setDescricao(text);
+              setErrorDescricao(''); 
             }}
           />
-          {errorContent ? <Text style={styles.errorText}>{errorContent}</Text> : null}
+          {errorDescricao ? <Text style={styles.errorText}>{errorDescricao}</Text> : null}
         </View>
 
         <TouchableOpacity style={styles.postButton} onPress={handleCreatePost}>
@@ -189,7 +213,7 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: 'center',
   },
-  title: {
+  titulo: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -230,7 +254,7 @@ const styles = StyleSheet.create({
     color: '#8B4513', // Marrom
     fontWeight: 'bold',
   },
-  titleInput: {
+  tituloInput: {
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,

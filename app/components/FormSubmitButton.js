@@ -18,10 +18,11 @@ const FormSubmitButton = ({ title, submitting, onPress }) => {
 
 const styles = StyleSheet.create({
   container: {
-    height: 45,
-    borderRadius: 8,
+    height: 60,
+    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 30,
   },
 });
 

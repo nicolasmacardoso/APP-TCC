@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import {
   createDrawerNavigator,
@@ -19,23 +19,14 @@ const CustomDrawer = (props) => {
   const { setIsLoggedIn, profile } = useLogin();
   const [profileImage, setProfileImage] = useState('');
 
-
-const base64ToImage = (base64) => {
+  const base64ToImage = (base64) => {
     return `data:image/jpeg;base64,${base64}`;
   };
 
   useEffect(() => {
-    // Simulação de dados do perfil (substitua isso com sua lógica real)
-    const profileData = {
-      avatar: profile.imagem,
-    };
-
-    console.log(profileImage, 'oiii')
-
-    setProfileImage(base64ToImage(profileData.avatar));
-
-  }, []);
-
+    setProfileImage(base64ToImage(profile?.imagem || ''));
+  }, [profile.imagem]);
+  
   const renderProfileImage = () => {
     if (profileImage) {
       return (
@@ -121,8 +112,18 @@ const base64ToImage = (base64) => {
 };
 
 const DrawerNavigator = () => {
-  return (
+  const { profile } = useLogin();
+  const [drawerKey, setDrawerKey] = useState(0);
+
+  useEffect(() => {
+    console.log('CustomDrawer - profileImage:', profileImage); // Adicione esta linha
+    setDrawerKey((prevKey) => prevKey + 1);
+  }, [profile?.imagem]);
+
+  // Use useMemo para criar um novo componente do DrawerNavigator quando a chave for atualizada
+  const MemoizedDrawerNavigator = useMemo(() => (
     <Drawer.Navigator
+      key={drawerKey}
       screenOptions={{
         headerShown: false,
         headerStyle: {
@@ -138,9 +139,10 @@ const DrawerNavigator = () => {
       <Drawer.Screen component={CriarPosts} name='Criar Publicação' />
       <Drawer.Screen component={ChatPrincipal} name='Bate-Papo' />
       <Drawer.Screen component={UserProfile} name='Meu Perfil' />
-
     </Drawer.Navigator>
-  );
+  ), [drawerKey]);
+
+  return MemoizedDrawerNavigator;
 };
 
 export default DrawerNavigator;

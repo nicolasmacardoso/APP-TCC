@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, Animated } from 'react-native';
+import { View, StyleSheet, Text, Animated, Image } from 'react-native';
 
 const FormHeader = ({
   leftHeading,
@@ -11,26 +11,35 @@ const FormHeader = ({
 }) => {
   return (
     <>
-      <View style={styles.container}>
-        <Animated.Text
-          style={[
-            styles.heading,
-            { transform: [{ translateX: leftHeaderTranslateX }] },
-          ]}
-        >
-          {leftHeading}
-        </Animated.Text>
-        <Animated.Text
-          style={[
-            styles.heading,
-            {
-              opacity: rightHeaderOpacity,
-              transform: [{ translateY: rightHeaderTranslateY }],
-            },
-          ]}
-        >
-          {rightHeading}
-        </Animated.Text>
+      <View>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('./CimaLogo2.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.container}>
+          <Animated.Text
+            style={[
+              styles.heading,
+              { transform: [{ translateX: leftHeaderTranslateX }] },
+            ]}
+          >
+            {leftHeading}
+          </Animated.Text>
+          <Animated.Text
+            style={[
+              styles.heading,
+              {
+                opacity: rightHeaderOpacity,
+                transform: [{ translateY: rightHeaderTranslateY }],
+              },
+            ]}
+          >
+            {rightHeading}
+          </Animated.Text>
+        </View>
       </View>
       <Text style={styles.subHeading}>{subHeading}</Text>
     </>
@@ -42,6 +51,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  logoContainer: {
+    marginRight: 10,
+    alignItems: 'center',
+  },
+  logo: {
+    width: 115,
+    position: 'absolute',
+    bottom: -80,
+    left: '36%',
   },
   heading: { fontSize: 30, fontWeight: 'bold', color: '#1b1b33' },
   subHeading: { fontSize: 18, color: '#1b1b33', textAlign: 'center' },

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
+import { FontAwesome } from '@expo/vector-icons';
 
 const BairroSelect = ({ value, onValueChange, label, placeholder }) => {
     const [bairros, setBairros] = useState([]);
@@ -49,12 +50,20 @@ const BairroSelect = ({ value, onValueChange, label, placeholder }) => {
             <Text style={styles.title}>{label}</Text>
             <TouchableOpacity style={styles.button}>
                 <RNPickerSelect
+                    style={styles.input}
                     onValueChange={(value) => handleInputChange(value)}
                     items={pickerItems}
-                    value={value && value.toString()} // Converta o valor para string
+                    value={value && value.toString()}
                     placeholder={{ label: placeholder, value: null }}
                 />
             </TouchableOpacity>
+            <View style={styles.iconContainer}>
+                <FontAwesome
+                    name={'globe'}
+                    size={22}
+                    color="#2E3E5C"
+                />
+            </View>
         </View>
     );
 };
@@ -63,6 +72,16 @@ const styles = StyleSheet.create({
     container: {
         marginBottom: 20,
     },
+    iconContainer: {
+        position: 'absolute',
+        left: 25,
+        top: '47.3%',
+    },
+    input: {
+        position: 'absolute',
+        width: 100,
+        backgroundColor: '#A9A9A9',
+    },
     title: {
         fontSize: 16,
         fontWeight: 'bold',
@@ -70,9 +89,11 @@ const styles = StyleSheet.create({
     },
     button: {
         borderWidth: 1,
-        borderColor: '#000',
-        borderRadius: 5,
-        padding: 10,
+        borderColor: '#A9A9A9',
+        borderRadius: 50,
+        height: 60,
+        justifyContent: 'center',
+        paddingLeft: 60,
     },
 });
 

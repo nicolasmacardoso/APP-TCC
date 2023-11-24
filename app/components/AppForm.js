@@ -99,12 +99,9 @@ const styles = StyleSheet.create({
   loginButton: {
     flex: 1,
     height: 80,
-    marginTop: 40,
   },
   signupButton: {
     flex: 1,
     height: 80,
-    marginTop: 40,
-
   },
 });

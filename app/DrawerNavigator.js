@@ -44,7 +44,7 @@ const CustomDrawer = (props) => {
   }, []); // [] significa que este useEffect é executado apenas uma vez, sem dependências
 
   const renderProfileImage = () => {
-    if (profileImage) {
+    if (profileImage.length > 30) {
       return (
         <Image
           source={{ uri: profileImage }}

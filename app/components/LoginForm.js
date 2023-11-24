@@ -76,7 +76,7 @@ const LoginForm = () => {
               onChangeText={handleChange('email')}
               onBlur={handleBlur('email')}
               autoCapitalize="none"
-              placeholder="Digite seu e-mail..."
+              placeholder="Email"
               placeholderTextColor="#A9A9A9"
             />
             <FormInput
@@ -89,10 +89,11 @@ const LoginForm = () => {
               onEyePress={() => setShowPassword(!showPassword)}
               onBlur={handleBlur('senha')}
               autoCapitalize="none"
-              placeholder="Digite sua senha..."
+              placeholder="Senha"
               placeholderTextColor="#A9A9A9"
             />
             <FormSubmitButton
+              style={{ paddingTop: 300}}
               submitting={isSubmitting}
               onPress={handleSubmit}
               title="Entrar"

@@ -16,10 +16,7 @@ const SignupForm = ({}) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [step, setStep] = useState(1);
   const [step1Data, setStep1Data] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const handleOnChangeText = (value, fieldName) => {
-    setUserInfo({ ...userInfo, [fieldName]: value });
-  };
+  
 
   const validationSchema = Yup.object({
     nome: Yup.string().trim().required('Nome é obrigatório.'),
@@ -127,7 +124,7 @@ const SignupForm = ({}) => {
                     icon = 'user'
                     onChangeText={handleChange('usuario')}
                     onBlur={handleBlur('usuario')}
-                    placeholder="Usuario"
+                    placeholder="Usuário"
                     placeholderTextColor="#A9A9A9"
                   />
                   <View style={styles.labelContainer}>
@@ -156,7 +153,7 @@ const SignupForm = ({}) => {
                   </View>
 
                   {touched.cpf && errors.cpf && (
-                    <Text style={{ color: 'red', fontSize: 16, textAlign: 'left',marginTop: -15, marginBottom: 10, marginLeft: 20,}}>
+                    <Text style={styles.errorText}>
                       {errors.cpf}
                     </Text>
                   )}
@@ -199,50 +196,59 @@ const SignupForm = ({}) => {
                   <FormInput
                     value={values.rua}
                     error={touched.rua && errors.rua}
+                    icon = 'globe'
                     onChangeText={handleChange('rua')}
                     onBlur={handleBlur('rua')}
-                    placeholder="Digite seu endereço..."
+                    placeholder="Endereço"
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.complemento}
                     error={touched.complemento && errors.complemento}
+                    icon = 'plus-circle'
                     onChangeText={handleChange('complemento')}
                     onBlur={handleBlur('complemento')}
-                    placeholder="Digite o complemento..."
+                    placeholder="Complemento"
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.numero_casa}
                     error={touched.numero_casa && errors.numero_casa}
+                    icon = 'home'
                     onChangeText={handleChange('numero_casa')}
                     onBlur={handleBlur('numero_casa')}
-                    placeholder="Digite o número..."
+                    placeholder="Número"
                     placeholderTextColor="#A9A9A9"
                   />
                    <BairroSelect
-                    value={values.codbairro}
-                    onValueChange={handleChange('codbairro')}
-                    placeholder="Selecione o bairro..."
-                  />
+                value={values.codbairro}
+                error={touched.codbairro && errors.codbairro}
+                onBlur={handleBlur('codbairro')}
+                onValueChange={handleChange('codbairro')}
+                placeholder="Bairro"
+                placeholderTextColor="#A9A9A9"
+              />
                 </>
               )}
-                <FormSubmitButton
-                  submitting={isSubmitting}
-                  onPress={handleSubmit}
-                  title={step === 1 ? 'Continuar' : 'Cadastrar'}
-                />
+                <View style={styles.buttonCadastrar}>
+                  <FormSubmitButton
+                    submitting={isSubmitting}
+                    onPress={handleSubmit}
+                    title={step === 1 ? 'Continuar' : 'Cadastrar'}
+                  />
+                </View>
                 {step === 2 && (
-                  <View style={{ marginTop: 20 }}>
-                    <FormSubmitButton
-                      submitting={isSubmitting}
-                      onPress={() => {
-                        setStep(1);
-                        setSuccessMessage('');
-                      }}
-                      title={'Voltar'}
-                    />
-                  </View>
+                   <View style={styles.backButtonContainer}>
+                      <FormSubmitButton
+                        submitting={isSubmitting}
+                        style={styles.backButton}
+                        onPress={() => {
+                          setStep(1);
+                          setSuccessMessage('');
+                        }}
+                        title={'Voltar'}
+                   />
+                 </View>
                 )}
             </>
           )}
@@ -260,14 +266,33 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     fontSize: 16,
     paddingLeft: 60,
-    marginBottom: 20,
-    marginTop: 15,
+    marginBottom: 15,
+    marginTop: 20,
   },
   iconContainer: {
     position: 'absolute',
     left: 25, 
-    top: '34%',
+    top: '32.4%',
   },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginTop: '72.4%',
+    marginLeft: 20,
+    position: 'absolute'
+  },
+  buttonCadastrar: {
+    marginTop: -85,
+    marginBottom: -50,
+    marginTop: -28,
+  },
+  backButtonContainer: {
+    marginBottom: 150,
+    marginTop: "0%",
+    marginTop: -20,
+    marginBottom: -50,
+  },
+
 });
 
 export default SignupForm;

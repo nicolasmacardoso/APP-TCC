@@ -1,31 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import {Animated, View, ScrollView, StyleSheet, Text, TextInput, Dimensions, Image, Platform } from 'react-native';
+import { Animated, View, ScrollView, StyleSheet, Text, TextInput, Dimensions, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
+
+if (!global.btoa) {
+  global.btoa = encode;
+}
+
+if (!global.atob) {
+  global.atob = decode;
+}
 
 const windowWidth = Dimensions.get('window').width;
 
 const App = () => {
   const [posts, setPosts] = useState([]);
+  const [nome, setNome] = useState([]);
   const [scrollY, setScrollY] = useState(new Animated.Value(0));
 
-  useEffect(() => {
-    // Chamada à API para buscar as postagens
-    axios.get('https://cima-production.up.railway.app/postagem/posts')
-      .then(response => setPosts(response.data))
-      .catch(error => console.error('Erro ao buscar postagens:', error));
-  }, []); // O array vazio garante que o useEffect seja executado apenas uma vez, equivalente ao componentDidMount
-
   const decodeBase64Image = (base64String) => {
-    const binaryString = atob(base64String);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+    if (!base64String) {
+      return null;
     }
-    const imageBlob = new Blob([bytes], { type: 'image/jpeg' }); // Altere o tipo conforme necessário
-    const imageUrl = URL.createObjectURL(imageBlob);
-    return imageUrl;
+
+    const uri = `data:image/jpeg;base64,${base64String}`;
+    return uri;
   };
+  useEffect(() => {
+    axios.get('https://cima-production.up.railway.app/postagem')
+      .then(response => {
+        console.log('Resposta da API:', response.data);
+        setPosts(response.data);
+      })
+      .catch(error => console.error('Erro ao buscar postagens:', error));
+
+      axios.get(`https://cima-production.up.railway.app/usuario/${posts.id}`)
+      .then(response => {
+        setNome(response.data);
+      })
+      .catch(error => console.error('Erro ao buscar postagens:', error));
+  }, []);
 
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
@@ -77,8 +91,8 @@ const App = () => {
           {posts.map((post) => (
             <View key={post.id} style={styles.post}>
               <Image source={{ uri: decodeBase64Image(post.imageUrl) }} style={styles.postImage} />
-              <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.content}</Text>
-              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)} • {post.author}</Text>
+              <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.descricao}</Text>
+              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)} • {nome.usuario}</Text>
             </View>
           ))}
         </View>
@@ -86,7 +100,6 @@ const App = () => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

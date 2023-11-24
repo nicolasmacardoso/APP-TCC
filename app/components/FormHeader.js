@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 50,
   },
 
   logoContainer: {
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 115,
     position: 'absolute',
-    bottom: -80,
+    bottom: -130,
     left: '36%',
   },
   heading: { fontSize: 30, fontWeight: 'bold', color: '#1b1b33' },

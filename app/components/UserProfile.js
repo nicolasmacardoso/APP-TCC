@@ -6,10 +6,11 @@ import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 
 const Perfil = () => {
-  const { profile, userId, registerProfileImageCallback, profileImageCallback } = useLogin();
+  const { profile, userId, registerProfileImageCallback, updateProfileImage } = useLogin();
   const [userName, setUserName] = useState('');
   const [profileImage, setProfileImage] = useState('');
-  
+  const [refreshKey, setRefreshKey] = useState(0); // Novo estado para forçar remontagem
+
   const [posts, setPosts] = useState([
     { id: 1, content: 'Post 1 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/200/200', author: 'Alice' },
     { id: 2, content: 'Post 2', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/201/201', author: 'Bob' },
@@ -30,6 +31,12 @@ const Perfil = () => {
   };
 
   useEffect(() => {
+    console.log('UserProfile - Component mounted');
+  }, [refreshKey]);
+
+  useEffect(() => {
+    const imageLength = profile?.imagem ? profile?.imagem.length : 0;
+    console.log(`UserProfile - profile.imagem length: ${imageLength}`);
     const profileData = {
       usuario: profile.usuario,
       avatar: profile.imagem,
@@ -41,16 +48,18 @@ const Perfil = () => {
   
 
   useEffect(() => {
+    console.log('UserProfile - Setting profileImage callback');
     const callback = (newImage) => {
       setProfileImage(base64ToImage(newImage));
+      console.log('UserProfile - profileImageCallback called');
     };
-    
-    registerProfileImageCallback(callback);    
-
+  
+    registerProfileImageCallback(callback);
+  
     return () => {
       registerProfileImageCallback(null);
     };
-  }, []);
+  }, [refreshKey]);
 
   const renderProfileImage = () => {
     if (profileImage) {
@@ -123,13 +132,10 @@ const Perfil = () => {
         });
 
         if (response.status === 200) {
-          setProfileImage(selectedImageUri);
-    
-          // Chame o callback após a atualização da imagem
-          if (profileImageCallback) {
-            profileImageCallback(base64Image);
-          }
-    
+          // Chama a função de atualização de imagem no contexto
+          updateProfileImage(base64Image);
+
+          console.log('UserProfile - Callback after updating image called');
           Alert.alert('Imagem atualizada com sucesso!');
         } else {
           Alert.alert('Erro ao enviar a imagem', 'A imagem não pôde ser enviada.');        

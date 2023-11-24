@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
-import { FontAwesome } from '@expo/vector-icons'; 
+import { FontAwesome } from '@expo/vector-icons';
 
 import Home from './components/Home';
 import CriarPosts from './components/CriarPosts';
@@ -16,7 +16,7 @@ import UserProfile from './components/UserProfile';
 const Drawer = createDrawerNavigator();
 
 const CustomDrawer = (props) => {
-  const { setIsLoggedIn, profile } = useLogin();
+  const { setIsLoggedIn, profile, registerProfileImageCallback } = useLogin();
   const [profileImage, setProfileImage] = useState('');
 
   const base64ToImage = (base64) => {
@@ -24,9 +24,25 @@ const CustomDrawer = (props) => {
   };
 
   useEffect(() => {
+    const imageLength = profile?.imagem ? profile?.imagem.length : 0;
+    console.log(`CustomDrawer - profile.imagem length: ${imageLength}`);
     setProfileImage(base64ToImage(profile?.imagem || ''));
-  }, [profile.imagem]);
-  
+  }, [profile?.imagem]); // Removido updateProfile como dependência
+
+  useEffect(() => {
+    const callback = (newImage) => {
+      setProfileImage(base64ToImage(newImage));
+    };
+
+    // Registra o callback diretamente
+    registerProfileImageCallback(callback);
+
+    // Remove o callback quando o componente é desmontado
+    return () => {
+      registerProfileImageCallback(null);
+    };
+  }, []); // [] significa que este useEffect é executado apenas uma vez, sem dependências
+
   const renderProfileImage = () => {
     if (profileImage) {
       return (
@@ -113,15 +129,34 @@ const CustomDrawer = (props) => {
 
 const DrawerNavigator = () => {
   const { profile } = useLogin();
+  const [profileChanged, setProfileChanged] = useState(false);
   const [drawerKey, setDrawerKey] = useState(0);
 
   useEffect(() => {
-    console.log('CustomDrawer - profileImage:', profileImage); // Adicione esta linha
-    setDrawerKey((prevKey) => prevKey + 1);
-  }, [profile?.imagem]);
+    const imageLength = profile?.imagem ? profile?.imagem.length : 0;
+    console.log(`DrawerNavigator - profile.imagem length: ${imageLength}`);
 
-  // Use useMemo para criar um novo componente do DrawerNavigator quando a chave for atualizada
-  const MemoizedDrawerNavigator = useMemo(() => (
+    if (profileChanged) {
+      // Atualiza o Drawer quando o perfil é alterado
+      setDrawerKey((prevKey) => prevKey + 1);
+      setProfileChanged(false); // Reseta o sinalizador de alteração
+    }
+
+  }, [profile, profileChanged]); // Adicionada a dependência profileChanged
+
+  useEffect(() => {
+    const profileChangeListener = () => {
+      // Sinaliza que o perfil foi alterado
+      setProfileChanged(true);
+    };
+
+    // Adiciona o ouvinte para mudanças no perfil
+    // Não é necessário remover o ouvinte ao desmontar, pois o contexto cuida disso
+    profileChangeListener();
+
+  }, []);
+
+  const DrawerComponent = (
     <Drawer.Navigator
       key={drawerKey}
       screenOptions={{
@@ -140,9 +175,9 @@ const DrawerNavigator = () => {
       <Drawer.Screen component={ChatPrincipal} name='Bate-Papo' />
       <Drawer.Screen component={UserProfile} name='Meu Perfil' />
     </Drawer.Navigator>
-  ), [drawerKey]);
+  );
 
-  return MemoizedDrawerNavigator;
+  return DrawerComponent;
 };
 
 export default DrawerNavigator;

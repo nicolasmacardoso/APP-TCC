@@ -10,6 +10,7 @@ const LoginProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [profileImageCallback, setProfileImageCallback] = useState(null);
+  const [profileUpdateKey, setProfileUpdateKey] = useState(0);
 
   useEffect(() => {
     const loadUserFromStorage = async () => {
@@ -31,7 +32,7 @@ const LoginProvider = ({ children }) => {
     };
 
     loadUserFromStorage();
-  }, []);
+  }, [profileUpdateKey]);
 
   const login = async (user) => {
     try {
@@ -65,8 +66,26 @@ const LoginProvider = ({ children }) => {
   };
 
   const registerProfileImageCallback = (callback) => {
+    console.log('LoginProvider - registerProfileImageCallback called');
     setProfileImageCallback(() => callback);
-  };  
+  };
+
+  const updateProfileImage = (newImage) => {
+    try {
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        imagem: newImage,
+      }));
+
+      if (profileImageCallback) {
+        profileImageCallback(newImage);
+      }
+
+      setProfileUpdateKey((prevKey) => prevKey + 1);
+    } catch (error) {
+      console.error('Erro ao atualizar imagem do perfil:', error);
+    }
+  };
 
   return (
     <LoginContext.Provider
@@ -82,6 +101,7 @@ const LoginProvider = ({ children }) => {
         loading,
         userId,
         registerProfileImageCallback,
+        updateProfileImage,
       }}
     >
       {children}

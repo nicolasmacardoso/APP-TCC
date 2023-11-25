@@ -16,10 +16,9 @@ import { useLogin } from '../context/LoginProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
 
 function ChatPrincipal() {
-  const { profile, userId, registerProfileImageCallback, updateProfileImage } = useLogin();
+  const {userId } = useLogin();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);

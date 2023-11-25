@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -48,12 +48,12 @@ const CustomDrawer = (props) => {
       return (
         <Image
           source={{ uri: profileImage }}
-          style={{ width: 80, height: 80, borderRadius: 100, borderWidth: 5, borderColor: '#3E5481' }}
+          style={{ width: 80, height: 80, borderRadius: 100, borderWidth: 4, borderColor: '#6180BF', marginLeft: -10}}
         />
       );
     } else {
       return (
-        <View style={{ width: 80, height: 80, borderRadius: 50, backgroundColor: '#FFFFFF', borderColor: '#76bbff', borderWidth: 4 }}>
+        <View style={{ width: 80, height: 80, borderRadius: 50, backgroundColor: '#FFFFFF', borderColor: '#6180BF', borderWidth: 4}}>
           <FontAwesome name="user-circle" size={71.999} color="#757575" />
         </View>
       );
@@ -86,26 +86,30 @@ const CustomDrawer = (props) => {
     });
     const truncatedName = filteredWords.join(' ');
 
-    return truncatedName.substring(0, maxLength) + '...';
+    return truncatedName.substring(0, maxLength)  + '...';
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <DrawerContentScrollView {...props}>
+      <DrawerContentScrollView {...props} bounces={false}>
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: 20,
-            backgroundColor: '#FAB550',
+            padding: 24,
+            backgroundColor: '#304269',
             marginBottom: 20,
           }}
         >
           {renderProfileImage()}
           <View>
-            <Text>{truncateName(profile?.nome || '', 18, ['de', 'da', 'das', 'dos', 'do'])}</Text>
-            <Text>{truncateString(profile?.email || '', 18)}</Text>
+            <Text style={styles.infoUser}>
+              {truncateName(profile?.nome || '', 18, ['de', 'da', 'das', 'dos', 'do'])}
+            </Text >
+            <Text style={styles.infoUser}>
+              {truncateString(profile?.email || '', 18)}
+              </Text>
           </View>
         </View>
         <DrawerItemList {...props} />
@@ -121,7 +125,7 @@ const CustomDrawer = (props) => {
         }}
         onPress={() => setIsLoggedIn(false)}
       >
-        <Text  style={{fontSize: 20,}}>Sair</Text>
+        <Text  style={{fontSize: 20, color: '#fff', fontFamily: 'Inter-bold', paddingLeft: 50}}>Sair</Text>
       </TouchableOpacity>
     </View>
   );
@@ -161,12 +165,11 @@ const DrawerNavigator = () => {
       key={drawerKey}
       screenOptions={{
         headerShown: false,
-        headerStyle: {
-          backgroundColor: 'transparent',
-          elevation: 0,
-          shadowOpacity: 0,
+        drawerLabelStyle: {
+          color: '#000', // Cor do texto do item do menu
         },
-        headerTitle: '',
+        drawerActiveBackgroundColor: '#FFE2D1', // Cor de fundo quando a página está ativa
+        drawerInactiveBackgroundColor: '#fff', // Cor de fundo quando a página não está ativa
       }}
       drawerContent={(props) => <CustomDrawer {...props} />}
     >
@@ -180,4 +183,14 @@ const DrawerNavigator = () => {
   return DrawerComponent;
 };
 
+const styles = StyleSheet.create({
+  infoUser: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingLeft: 10,
+
+  }
+})
 export default DrawerNavigator;

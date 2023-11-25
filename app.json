@@ -4,9 +4,9 @@
     "slug": "CimaAPP",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./app/components/CimaLogo.png",
+    "icon": "./app/Imagens/CimaLogo.png",
     "splash": {
-      "image": "./app/components/CimaLogo.png",
+      "image": "./app/Imagens/CimaLogo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -21,12 +21,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./app/components/CimaLogo.png",
+        "foregroundImage": "./app/Imagens/CimaLogo.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
-      "favicon": "./app/components/CimaLogo.png"
+      "favicon": "./app/Imagens/CimaLogo.png"
     }
   }
 }

@@ -10,19 +10,16 @@ const SplashScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Insira a imagem da sua logo aqui */}
       <Image
-        source={require('./CimaLogo.png')}
+        source={require('../Imagens/CimaLogo.png')}
         style={styles.logo}
         resizeMode="contain"
       />
 
-      {/* Frase abaixo da logo */}
       <Text style={styles.tagline}>
         Unindo o Bairro, Notícia a Notícia, Coração a Coração.
       </Text>
 
-      {/* Botão Iniciar */}
       <TouchableOpacity
         style={styles.startButton}
         onPress={handleStartButtonPress}
@@ -41,28 +38,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF', // Cor de fundo da tela
   },
   logo: {
-    width: 340,
-    height: 340,
-    marginBottom: 15, // Reduzi o espaço entre a logo e a frase
+    width: 380,
+    height: 380,
+    marginBottom: 7, // Reduzi o espaço entre a logo e a frase
+    marginTop: -70,
   },
   tagline: {
     color: '#304269', // Cor do texto da frase
-    fontSize: 24,
+    fontSize: 20,
     textAlign: 'center',
     marginBottom: 30, // Adicionado espaço abaixo da frase
     marginTop: -5,
+    fontFamily: 'Inter-Medium',
+    width: 400,
   },
   startButton: {
     backgroundColor: '#304269', // Cor de fundo do botão
-    paddingVertical: 18,
+    paddingVertical: 21,
     paddingHorizontal: 145,
     borderRadius: 30, // Aumentei o raio para tornar mais arredondado
-    marginTop: 75,
+    marginTop: 45,
   },
   buttonText: {
     color: '#FFFFFF', // Cor do texto do botão
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Inter-bold',
   },
 });
 

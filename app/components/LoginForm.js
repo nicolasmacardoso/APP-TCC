@@ -93,7 +93,6 @@ const LoginForm = () => {
               placeholderTextColor="#A9A9A9"
             />
             <FormSubmitButton
-              style={{ paddingTop: 300}}
               submitting={isSubmitting}
               onPress={handleSubmit}
               title="Entrar"

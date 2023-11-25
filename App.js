@@ -28,7 +28,6 @@ export default function App() {
       try {
         await AsyncStorage.setItem('@user', ''); // Inicializa o AsyncStorage se necessário
       } catch (e) {
-        console.error('Erro ao configurar o AsyncStorage:', e);
       }
     };
 

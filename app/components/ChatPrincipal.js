@@ -16,9 +16,10 @@ import { useLogin } from '../context/LoginProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios';
 
 function ChatPrincipal() {
-  const {userId } = useLogin();
+  const { profile, userId, registerProfileImageCallback, updateProfileImage } = useLogin();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -27,7 +28,7 @@ function ChatPrincipal() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io('http://192.168.1.57:3000', {
+    socketRef.current = io('http://192.168.0.114:3000', {
       reconnection: true,
     });
 

@@ -17,8 +17,10 @@ const FormContainer = ({ children }) => {
       keyboardVerticalOffset={260} // Ajuste este valor conforme necessário
     > 
       <ScrollView
+      ref={(ref) => (scrollView = ref)}
         contentContainerStyle={{ flexGrow: 1}} // Ajuste marginTop conforme necessário
         keyboardShouldPersistTaps="handled"
+        bounces={false}
       >
         {children}
       </ScrollView>
@@ -31,7 +33,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: Dimensions.get('window').width,
     paddingHorizontal: 20,
-    marginTop: 50,
+    marginTop: 70,
   },
 });
 

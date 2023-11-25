@@ -14,7 +14,7 @@ const FormHeader = ({
       <View>
         <View style={styles.logoContainer}>
           <Image
-            source={require('./CimaLogo2.png')}
+            source={require('../Imagens/CimaLogo2.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
   logo: {
     width: 115,
     position: 'absolute',
-    bottom: -130,
+    bottom: -120,
     left: '36%',
   },
-  heading: { fontSize: 30, fontWeight: 'bold', color: '#1b1b33' },
-  subHeading: { fontSize: 18, color: '#1b1b33', textAlign: 'center' },
+  heading: { fontSize: 29, color: '#1b1b33', fontFamily: 'Inter-bold'},
+  subHeading: { marginTop: 10,fontSize: 18, color: '#1b1b33', textAlign: 'center', fontFamily: 'Inter-Regular' },
 });
 
 export default FormHeader;

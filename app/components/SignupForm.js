@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, StyleSheet, Keyboard} from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -16,7 +16,8 @@ const SignupForm = ({}) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [step, setStep] = useState(1);
   const [step1Data, setStep1Data] = useState(null);
-  
+
+  const scrollViewRef = useRef(null);
 
   const validationSchema = Yup.object({
     nome: Yup.string().trim().required('Nome é obrigatório.'),
@@ -45,6 +46,7 @@ const SignupForm = ({}) => {
         setStep1Data(values);
         setSuccessMessage('');
         setStep(2); 
+        scrollViewRef.current.scrollTo({ y: 0, animated: true });
       } else {
         const response = await axios.post('https://cima-production.up.railway.app/usuario_temp', {
           ...step1Data,
@@ -70,7 +72,7 @@ const SignupForm = ({}) => {
   };
 
   return (
-      <FormContainer>
+      <FormContainer scrollViewRef={scrollViewRef}>
         {error ? (
           <Text style={{ color: 'red', fontSize: 18, textAlign: 'center' }}>
             {error}
@@ -220,14 +222,14 @@ const SignupForm = ({}) => {
                     placeholder="Número"
                     placeholderTextColor="#A9A9A9"
                   />
-                   <BairroSelect
-                value={values.codbairro}
-                error={touched.codbairro && errors.codbairro}
-                onBlur={handleBlur('codbairro')}
-                onValueChange={handleChange('codbairro')}
-                placeholder="Bairro"
-                placeholderTextColor="#A9A9A9"
-              />
+                  <BairroSelect
+                    value={values.codbairro}
+                    error={touched.codbairro && errors.codbairro}
+                    onBlur={handleBlur('codbairro')}
+                    onValueChange={handleChange('codbairro')}
+                    placeholder="Bairro"
+                    placeholderTextColor="#A9A9A9"
+                  />
                 </>
               )}
                 <View style={styles.buttonCadastrar}>
@@ -268,6 +270,8 @@ const styles = StyleSheet.create({
     paddingLeft: 60,
     marginBottom: 15,
     marginTop: 20,
+    fontFamily: 'Inter-Regular',
+
   },
   iconContainer: {
     position: 'absolute',
@@ -277,7 +281,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     fontSize: 16,
-    marginTop: '72.4%',
+    marginTop: '73.5%',
     marginLeft: 20,
     position: 'absolute'
   },

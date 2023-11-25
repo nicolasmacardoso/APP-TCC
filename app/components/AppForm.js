@@ -57,6 +57,7 @@ export default function AppForm({ navigation }) {
         ref={scrollView}
         horizontal
         pagingEnabled
+        bounces={false}
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={16}
         onScroll={Animated.event(
@@ -67,20 +68,6 @@ export default function AppForm({ navigation }) {
         <LoginForm navigation={navigation} />
         <SignupForm navigation={navigation} />
       </ScrollView>
-      <View style={styles.buttonContainer}>
-        <FormSelectorBtn
-          style={[styles.loginButton]}
-          backgroundColor={loginColorInterpolate}
-          title='Login'
-          onPress={() => scrollView.current.scrollTo({ x: 0 })}
-        />
-        <FormSelectorBtn
-          style={[styles.signupButton]}
-          backgroundColor={signupColorInterpolate}
-          title='Cadastrar'
-          onPress={() => scrollView.current.scrollTo({ x: width })}
-        />
-      </View>
     </View>
   );
 }

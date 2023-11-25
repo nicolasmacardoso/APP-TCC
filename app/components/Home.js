@@ -7,39 +7,47 @@ const windowWidth = Dimensions.get('window').width;
 
 const App = () => {
   const [posts, setPosts] = useState([]);
-  const [userNames, setUserNames] = useState([]);
   const [scrollY, setScrollY] = useState(new Animated.Value(0));
+
+  const base64ToImage = (base64) => {
+    return `data:image/jpeg;base64,${base64}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('https://cima-production.up.railway.app/postagem');
-        console.log('Resposta da API:', response.data);
-        setPosts(response.data);
 
-        const userNamesPromises = response.data.map(async (post) => {
-          const userResponse = await axios.get(`https://cima-production.up.railway.app/usuario/${post.id}`);
-          return userResponse.data.usuario || 'Nome Desconhecido';
-        });
+        const postsWithUserDetails = await Promise.all(
+          response.data.map(async (post) => {
+            try {
+              const userResponse = await axios.get(`https://cima-production.up.railway.app/usuario/${post.codusuario}`);
+              console.log(post.codusuario, "oii");
+              const userDetails = userResponse.data[0];
+              const usuario = userDetails ? userDetails.usuario : "Nome de usuário não disponível3";
 
-        const userNamesResult = await Promise.all(userNamesPromises);
-        setUserNames(userNamesResult);
+              return { ...post, usuario };
+            } catch (userError) {
+              return { ...post, usuario: "Nome de usuário não disponível2" };
+            }
+          })
+        );
+
+        setPosts(postsWithUserDetails);
       } catch (error) {
-        console.error('Erro ao buscar postagens:', error);
+        console.error('Erro ao buscar dados:', error);
       }
     };
 
+    // Fetch data initially
     fetchData();
+
+    // Poll for new data every 5 seconds (adjust the interval as needed)
+    const intervalId = setInterval(fetchData, 1000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
-
-  const decodeBase64Image = (base64String) => {
-    if (!base64String) {
-      return null;
-    }
-
-    const uri = `data:image/jpeg;base64,${base64String}`;
-    return uri;
-  };
 
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
@@ -50,14 +58,14 @@ const App = () => {
     const minutes = Math.floor(timeDiff / (1000 * 60));
 
     if (minutes < 60) {
-      return `${minutes} min ago`;
+      return `${minutes} min atrás`;
     } else {
       const hours = Math.floor(minutes / 60);
       if (hours < 24) {
-        return `${hours}h ago`;
+        return `${hours}h atrás`;
       } else {
         const days = Math.floor(hours / 24);
-        return `${days}d ago`;
+        return `${days}d atrás`;
       }
     }
   };
@@ -70,7 +78,7 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={{ ...styles.searchBar, paddingTop: headerHeight }}>
+      <View style={styles.searchBar}>
         <TextInput
           style={styles.searchInput}
           placeholder="Pesquisa"
@@ -79,20 +87,21 @@ const App = () => {
         <View style={styles.searchIcon}>
           <FontAwesome name="search" size={20} color="#304269" />
         </View>
-      </Animated.View>
+      </View>
       <ScrollView
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
-        scrollEventThrottle={16}
+        scrollEventThrottle={20}
+        contentContainerStyle={styles.scrollContainer}
       >
         <View style={styles.postContainer}>
-          {posts.map((post, index) => (
+          {posts.map((post) => (
             <View key={post.id} style={styles.post}>
-              <Image source={{ uri: decodeBase64Image(post.imageUrl) }} style={styles.postImage} />
-              <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.descricao}</Text>
-              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)} • {userNames[index]}</Text>
+              <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
+              <Text style={styles.postInfo}>{post.usuario}</Text>
+              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)}</Text>
             </View>
           ))}
         </View>
@@ -110,8 +119,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 50,
+    paddingBottom: 30,
     backgroundColor: '#304269',
-    paddingTop: 125,
+    paddingTop: 70,
   },
   searchIcon: {
     position: 'absolute',
@@ -134,14 +144,14 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   post: {
-    width: '48%', // 2% menos para a margem entre os quadrados
-    aspectRatio: 0.7, // Mantendo a proporção 1:1 para ser um quadrado
+    width: '48%',
+    aspectRatio: 0.7,
     borderRadius: 8,
     marginBottom: 16,
   },
   postImage: {
     width: '100%',
-    height: '70%', // Ajuste a altura conforme necessário
+    height: '70%',
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
     resizeMode: 'cover',

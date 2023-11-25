@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 50,
     fontSize: 16,
+    fontFamily: 'Inter-Regular',
     paddingLeft: 60,
   },
   icon: {

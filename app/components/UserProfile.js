@@ -66,12 +66,12 @@ const Perfil = () => {
       return (
         <Image
           source={{ uri: profileImage }}
-          style={{ width: 175, height: 175, borderRadius: 100, borderWidth: 5, borderColor: '#3E5481'}}
+          style={{ width: 175, height: 175, borderRadius: 100, borderWidth: 5, borderColor: '#304269'}}
         />
       );
     } else {
       return (
-        <View style={{ width: 175, height: 175, borderRadius: 100, backgroundColor: '#FFFFFF', borderColor: '#3E5481', borderWidth: 4}}>
+        <View style={{ width: 175, height: 175, borderRadius: 100, backgroundColor: '#FFFFFF', borderColor: '#304269', borderWidth: 4}}>
           <FontAwesome name="user-circle" size={166.999} color="#757575" />
         </View>
       );
@@ -101,7 +101,7 @@ const Perfil = () => {
     try {
       const options = {
         mediaType: 'photo',
-        quality: 1,
+        quality: 0.5,
         allowsEditing: true,
         aspect: [1, 1],
         storageOptions: {
@@ -147,15 +147,22 @@ const Perfil = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      bounces={false}>
       <View style={styles.profileContainer}>
-        <TouchableOpacity onPress={pickImage}>
-          {renderProfileImage()}
-        </TouchableOpacity>
+        <View style={styles.blueBackground}></View>
+        <View style={styles.fotoPerfil}>
+          <TouchableOpacity onPress={pickImage}>
+            {renderProfileImage()}
+          </TouchableOpacity>
+        </View>
         <Text style={styles.profileName}>{userName}</Text>
+        <Text style={styles.profileNome}>{profile.nome}</Text>
         <View style={styles.publicationsContainer}>
           <Text style={styles.publicationsText}> Minhas Publicações</Text>
-          <View style={styles.blueLine} />
+          <View style={styles.Line2} />
+          <View style={styles.Line} />
         </View>
       </View>
       <View style={styles.postContainer}>
@@ -195,9 +202,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  blueBackground: {
+    backgroundColor: '#304269',
+    height: '100%', // Ajuste conforme necessário
+    position: 'absolute',
+    top: -205,
+    left: 0,
+    right: 0,
+  },
   profileContainer: {
     alignItems: 'center',
-    marginTop: 100,
+    marginTop: 84,
     marginBottom: 20,
     position: 'relative', // Adicionado para posicionar corretamente o conteúdo fixo
   },
@@ -211,7 +226,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#3E5481',
+    color: '#304269',
+  },
+  profileNome: {
+    fontSize: 14,
+    color: '#304269',
   },
   postContainer: {
     backgroundColor: '#fff',
@@ -253,18 +272,27 @@ const styles = StyleSheet.create({
   publicationsText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#3E5481',
+    color: '#304269',
     marginTop: 0,
     bottom: -24,
-    width: '100%',
+    marginLeft: -7,
     textAlign: 'center',
   },
-  blueLine: {
-    width: 200,
+  Line: {
+    width: 230,
     height: 3,
     backgroundColor: '#F26101',
     marginTop: 0,
+    marginLeft: 5,
     position: 'fixed',
+    bottom: -24,
+  },
+  Line2: {
+    width: 450,
+    height: 3,
+    backgroundColor: '#EEEEEE',
+    marginTop: 0,
+    position: 'absolute',
     bottom: -24,
   },
 });

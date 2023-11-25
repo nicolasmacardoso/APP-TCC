@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 16,
+        fontFamily: 'Inter-Regular',
         fontWeight: 'bold',
         marginBottom: 5,
     },

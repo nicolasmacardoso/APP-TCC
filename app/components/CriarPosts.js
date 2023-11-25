@@ -119,7 +119,7 @@ const CreatePostScreen = () => {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 1,
+        quality: 0.1,
       });
   
       if (!result.canceled) {
@@ -143,7 +143,7 @@ const CreatePostScreen = () => {
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <KeyboardAwareScrollView
         contentContainerStyle={styles.container}
-        extraScrollHeight={Platform.select({ ios: 50, android: 0 })}
+        extraScrollHeight={Platform.select({ ios: 150, android: 0 })}
         enableOnAndroid
       >
         <Text style={styles.titulo}>Criar Publicação</Text>
@@ -156,7 +156,7 @@ const CreatePostScreen = () => {
                 <Image source={{ uri: imagem }} style={styles.previewImage} />
               ) : (
                 <>
-                  <AntDesign name="picture" size={40} color="#FFA500" />
+                  <AntDesign name="picture" size={40} color="#F26101" />
                   <Text style={styles.imagePickerText}>Adicionar Imagem</Text>
                 </>
               )}
@@ -168,7 +168,7 @@ const CreatePostScreen = () => {
           <TextInput
             style={styles.tituloInput}
             placeholder="Digite o título..."
-            placeholderTextColor="#ccc"
+            placeholderTextColor="#aaa"
             value={titulo}
             onChangeText={(text) => {
               settitulo(text);
@@ -181,7 +181,7 @@ const CreatePostScreen = () => {
           <TextInput
             style={styles.descriptionInput}
             placeholder="Nos conte mais sobre sua postagem..."
-            placeholderTextColor="#ccc"
+            placeholderTextColor="#aaa"
             multiline
             numberOfLines={4}
             value={descricao}
@@ -200,8 +200,13 @@ const CreatePostScreen = () => {
         <Modal transparent={true} visible={modalVisible} onRequestClose={closeModal}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <AntDesign name="checkcircle" size={128} color="#FFA500" />
-              <Text style={styles.modalText}>Publicação concluída com sucesso!</Text>
+            {imagem ? (
+              <Image source={{ uri: imagem }} style={styles.previewImage} />
+            ) : (
+              <Image source={require('../Imagens/Emoji.png')} style={styles.iconImage} />
+            )}
+              <Text style={styles.modalTitle}>Sucesso na postagem!</Text>
+              <Text style={styles.modalText}>Sua publicação foi carregada e agora está disponível no seu perfil.</Text>
               <TouchableHighlight style={styles.okButton} onPress={closeModal}>
                 <Text style={styles.okButtonText}>OK</Text>
               </TouchableHighlight>
@@ -220,13 +225,18 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: 'center',
   },
+  iconImage : {
+    width: 200,
+    height: 200,
+  },
   titulo: {
     fontSize: 24,
+    fontFamily: 'Inter-bold',
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 16,
     marginTop: -20,
-    color: '#8B4513', // Marrom
+    color: '#F26101', // Marrom
   },
   formContainer: {
     marginTop: 40,
@@ -238,8 +248,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     padding: 20,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    borderWidth: 2,
+    borderColor: '#aaa',
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
@@ -251,41 +261,47 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   imagePickerText: {
-    color: '#FFA500', // Laranja
+    color: '#F26101', // Laranja
+    fontFamily: 'Inter-Medium',
     marginTop: 8,
   },
   label: {
     fontSize: 18,
     marginBottom: 8,
-    color: '#8B4513', // Marrom
-    fontWeight: 'bold',
+    color: '#F26101', // Marrom
+    fontFamily: 'Inter-bold',
   },
   tituloInput: {
-    height: 40,
-    borderColor: '#ccc',
+    height: 60,
+    borderColor: '#aaa',
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 10,
-    borderRadius: 8,
+    borderRadius: 50,
+    paddingLeft: 20,
     fontSize: 16,
   },
   descriptionInput: {
-    height: 80,
-    borderColor: '#ccc',
+    height: 100,
+    borderColor: '#aaa',
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 10,
-    borderRadius: 4,
+    paddingTop: 10,
+    paddingLeft: 20,
+    borderRadius: 20,
     fontSize: 16,
   },
   postButton: {
-    backgroundColor: '#FFA500', // Laranja
-    padding: 16,
+    backgroundColor: '#304269', // Laranja
+    height: 60,
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 50,
     marginHorizontal: 16,
     marginBottom: 16,
-    marginTop: 50,
+    marginTop: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   postButtonText: {
     color: '#fff',
@@ -301,19 +317,32 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     padding: 32,
-    borderRadius: 8,
+    borderRadius: 20,
     alignItems: 'center',
   },
   modalText: {
     fontSize: 18,
-    marginTop: 16,
-    marginBottom: 24,
+    color: '#3E5481',
+    fontFamily: 'Inter-Medium',
+    marginBottom: 30,
+    width: 250,
+    textAlign: 'center',
+  },
+  modalTitle: {
+    fontSize: 22,
+    color: '#3E5481',
+    fontFamily: 'Inter-bold',
+    marginTop: 24,
+    marginBottom: 30,
+    width: 300,
     textAlign: 'center',
   },
   okButton: {
-    backgroundColor: '#FFA500',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: '#304269',
+    height: 60,
+    borderRadius: 50,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
   },
   okButtonText: {
     color: '#fff',

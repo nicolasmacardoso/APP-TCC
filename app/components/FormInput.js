@@ -24,7 +24,7 @@ const FormInput = (props) => {
     <>
       <View style={styles.inputContainer}>
         <View style={styles.inputContentContainer}>
-          <Text style={{ fontWeight: 'bold', marginBottom: 5 }}></Text>
+          <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>{label}</Text>
           <TextInput
             {...inputProps}
             placeholder={placeholder}
@@ -32,23 +32,19 @@ const FormInput = (props) => {
             secureTextEntry={secureTextEntry && !isPasswordVisible}
             placeholderTextColor="#A9A9A9"
           />
-            {props.error ? <Text style={styles.errorText}>{props.error}</Text> : null}
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </View>
         <View style={styles.iconContainer}>
-        {secureTextEntry && (
+          {secureTextEntry && (
             <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeIcon}>
               <FontAwesome
                 name={isPasswordVisible ? 'eye' : eyeIcon}
-                size={22}
-                color="#646FA3"
+                size={21}
+                color="#2E3E5C"
               />
             </TouchableOpacity>
           )}
-        </View>
-        <View style={styles.iconContainer2}>          
-          {icon && (
-            <FontAwesome name={icon} size={21} color="#2E3E5C" style={{ marginLeft: 20 }} />
-          )}
+          <FontAwesome name={icon} size={21} color="#2E3E5C" style={styles.icon} />
         </View>
       </View>
     </>
@@ -66,24 +62,20 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     position: 'absolute',
-    right: -2, 
-    top: '17%',
-  },
-  iconContainer2: {
-    position: 'absolute',
-    left: 5, 
-    top: '47%',
+    right: 20,
+    top: '50%',
+    transform: [{ translateY: -10 }], // Ajuste conforme necessário
   },
   eyeIcon: {
-    padding: 25,
+    padding: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#A8B3C5',
-    height: 60,
+    borderColor: '#1b1b33',
+    height: 60, // Altura ajustada conforme necessário
     borderRadius: 50,
     fontSize: 16,
-    paddingLeft: 60,
+    paddingLeft: 20, // Ajuste conforme necessário
   },
   icon: {
     position: 'absolute',
@@ -92,9 +84,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     fontSize: 16,
-    marginTop: 85,
-    marginLeft: 20,
-    position: 'absolute'
+    marginTop: 5,
   },
 });
 

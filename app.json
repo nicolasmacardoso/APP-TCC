@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "CimaAPP",
-    "slug": "CimaAPP",
+    "name": "react-native-form",
+    "slug": "react-native-form",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./app/components/CimaLogo.png",

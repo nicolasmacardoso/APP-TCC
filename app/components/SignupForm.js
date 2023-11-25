@@ -3,7 +3,6 @@ import { Text, View, StyleSheet, Keyboard} from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { FontAwesome } from '@expo/vector-icons';
 
 import BairroSelect from './BairroSelect';
 import FormContainer from './FormContainer';
@@ -16,7 +15,10 @@ const SignupForm = ({}) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [step, setStep] = useState(1);
   const [step1Data, setStep1Data] = useState(null);
-  
+  const [showPassword, setShowPassword] = useState(false);
+  const handleOnChangeText = (value, fieldName) => {
+    setUserInfo({ ...userInfo, [fieldName]: value });
+  };
 
   const validationSchema = Yup.object({
     nome: Yup.string().trim().required('Nome é obrigatório.'),
@@ -112,23 +114,29 @@ const SignupForm = ({}) => {
                   <FormInput
                     value={values.nome}
                     error={touched.nome && errors.nome}
-                    icon = 'address-card'
                     onChangeText={handleChange('nome')}
                     onBlur={handleBlur('nome')}
-                    placeholder="Nome Completo."
+                    label="Nome Completo"
+                    placeholder="Digite seu nome completo..."
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.usuario}
                     error={touched.usuario && errors.usuario}
-                    icon = 'user'
                     onChangeText={handleChange('usuario')}
                     onBlur={handleBlur('usuario')}
-                    placeholder="Usuário"
+                    label="Nome de Usuário"
+                    placeholder="Digite seu nome de usuário..."
                     placeholderTextColor="#A9A9A9"
                   />
                   <View style={styles.labelContainer}>
+                    <Text style={styles.label}>CPF</Text>
                   </View>
+                  {touched.cpf && errors.cpf && (
+                    <Text style={{ color: 'red', fontSize: 16, textAlign: 'right',marginTop: -30, marginBottom: 10.5,}}>
+                      {errors.cpf}
+                    </Text>
+                  )}
                   <TextInputMask
                     type={'cpf'}
                     options={{
@@ -140,53 +148,44 @@ const SignupForm = ({}) => {
                     onChangeText={(text) => handleChange('cpf')(text.replace(/\D/g, ''))}
                     onBlur={handleBlur('cpf')}
                     style={styles.input}
-                    placeholder="CPF"
+                    placeholder="Digite seu CPF..."
                     placeholderTextColor="#A9A9A9"
                     keyboardType="numeric"
                   />
-                  <View style={styles.iconContainer}>
-                    <FontAwesome
-                      name={'file-text'}
-                      size={22}
-                      color="#2E3E5C"
-                    />
-                  </View>
-
-                  {touched.cpf && errors.cpf && (
-                    <Text style={styles.errorText}>
-                      {errors.cpf}
-                    </Text>
-                  )}
                   <FormInput
                     value={values.email}
                     error={touched.email && errors.email}
-                    icon = 'envelope'
                     onChangeText={handleChange('email')}
                     onBlur={handleBlur('email')}
                     autoCapitalize="none"
-                    placeholder="Email"
+                    label="E-mail"
+                    placeholder="Digite seu e-mail..."
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.senha}
                     error={touched.senha && errors.senha}
-                    icon = 'key'
                     onChangeText={handleChange('senha')}
-                    secureTextEntry
-                    onBlur={handleBlur('senha')}
+                    secureTextEntry={!showPassword}
+                    eyeIcon={showPassword ? 'eye-slash' : 'eye'}
+                    onEyePress={() => setShowPassword(!showPassword)}
+                    onBlur={handleBlur('confirmSenha')}
                     autoCapitalize="none"
-                    placeholder="Senha"
+                    label="Senha"
+                    placeholder="Digite sua senha..."
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.confirmSenha}
                     error={touched.confirmSenha && errors.confirmSenha}
-                    icon = 'key'
                     onChangeText={handleChange('confirmSenha')}
-                    secureTextEntry
+                    secureTextEntry={!showPassword}
+                    eyeIcon={showPassword ? 'eye-slash' : 'eye'}
+                    onEyePress={() => setShowPassword(!showPassword)}
                     onBlur={handleBlur('confirmSenha')}
                     autoCapitalize="none"
-                    placeholder="Confirmar senha"
+                    label="Confirme a Senha"
+                    placeholder="Confirme sua senha..."
                     placeholderTextColor="#A9A9A9"
                   />
                 </>
@@ -196,59 +195,54 @@ const SignupForm = ({}) => {
                   <FormInput
                     value={values.rua}
                     error={touched.rua && errors.rua}
-                    icon = 'globe'
                     onChangeText={handleChange('rua')}
                     onBlur={handleBlur('rua')}
-                    placeholder="Endereço"
+                    label="Endereço"
+                    placeholder="Digite seu endereço..."
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.complemento}
                     error={touched.complemento && errors.complemento}
-                    icon = 'plus-circle'
                     onChangeText={handleChange('complemento')}
                     onBlur={handleBlur('complemento')}
-                    placeholder="Complemento"
+                    label="Complemento(Opcional)"
+                    placeholder="Digite o complemento..."
                     placeholderTextColor="#A9A9A9"
                   />
                   <FormInput
                     value={values.numero_casa}
                     error={touched.numero_casa && errors.numero_casa}
-                    icon = 'home'
                     onChangeText={handleChange('numero_casa')}
                     onBlur={handleBlur('numero_casa')}
-                    placeholder="Número"
+                    label="Número"
+                    placeholder="Digite o número..."
                     placeholderTextColor="#A9A9A9"
                   />
                    <BairroSelect
-                value={values.codbairro}
-                error={touched.codbairro && errors.codbairro}
-                onBlur={handleBlur('codbairro')}
-                onValueChange={handleChange('codbairro')}
-                placeholder="Bairro"
-                placeholderTextColor="#A9A9A9"
-              />
+                    value={values.codbairro}
+                    onValueChange={handleChange('codbairro')}
+                    label="Bairro"
+                    placeholder="Selecione o bairro..."
+                  />
                 </>
               )}
-                <View style={styles.buttonCadastrar}>
-                  <FormSubmitButton
-                    submitting={isSubmitting}
-                    onPress={handleSubmit}
-                    title={step === 1 ? 'Continuar' : 'Cadastrar'}
-                  />
-                </View>
+                <FormSubmitButton
+                  submitting={isSubmitting}
+                  onPress={handleSubmit}
+                  title={step === 1 ? 'Continuar' : 'Cadastrar'}
+                />
                 {step === 2 && (
-                   <View style={styles.backButtonContainer}>
-                      <FormSubmitButton
-                        submitting={isSubmitting}
-                        style={styles.backButton}
-                        onPress={() => {
-                          setStep(1);
-                          setSuccessMessage('');
-                        }}
-                        title={'Voltar'}
-                   />
-                 </View>
+                  <View style={{ marginTop: 20 }}>
+                    <FormSubmitButton
+                      submitting={isSubmitting}
+                      onPress={() => {
+                        setStep(1);
+                        setSuccessMessage('');
+                      }}
+                      title={'Voltar'}
+                    />
+                  </View>
                 )}
             </>
           )}
@@ -261,38 +255,21 @@ const SignupForm = ({}) => {
 const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
-    borderColor: '#A8B3C5',
-    height: 60,
-    borderRadius: 50,
+    borderColor: '#1b1b33',
+    height: 35,
+    borderRadius: 8,
     fontSize: 16,
-    paddingLeft: 60,
-    marginBottom: 15,
-    marginTop: 20,
+    paddingLeft: 10,
+    marginBottom: 20,
   },
-  iconContainer: {
-    position: 'absolute',
-    left: 25, 
-    top: '32.4%',
+  labelContainer: {
+    marginBottom: 5,
   },
-  errorText: {
-    color: 'red',
+  label: {
     fontSize: 16,
-    marginTop: '72.4%',
-    marginLeft: 20,
-    position: 'absolute'
+    fontWeight: 'bold',
+    color: 'black', // ou a cor desejada
   },
-  buttonCadastrar: {
-    marginTop: -85,
-    marginBottom: -50,
-    marginTop: -28,
-  },
-  backButtonContainer: {
-    marginBottom: 150,
-    marginTop: "0%",
-    marginTop: -20,
-    marginBottom: -50,
-  },
-
 });
 
 export default SignupForm;

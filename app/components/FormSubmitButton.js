@@ -1,17 +1,17 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text as RNText } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 
 const FormSubmitButton = ({ title, submitting, onPress }) => {
   const backgroundColor = submitting
     ? 'rgba(27,27,51,0.4)'
-    : '#2E3E5C';
+    : 'rgba(27,27,51,1)';
 
   return (
     <TouchableOpacity
       onPress={!submitting ? onPress : null}
       style={[styles.container, { backgroundColor }]}
     >
-      <RNText style={{ fontSize: 18, color: '#fff', fontFamily: 'Inter-bold' }}>{title}</RNText>
+      <Text style={{ fontSize: 18, color: '#fff' }}>{title}</Text>
     </TouchableOpacity>
   );
 };
@@ -22,8 +22,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 100,
-    marginTop: 50,
+    marginTop: 30,
   },
 });
 

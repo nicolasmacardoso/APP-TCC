@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import {
   View,
   StyleSheet,
@@ -16,7 +16,7 @@ import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import axios from 'axios';
-import { useLogin } from '../context/LoginProvider';
+import {useLogin} from '../context/LoginProvider'; // Certifique-se de importar corretamente o contexto
 
 const CreatePostScreen = () => {
   const [titulo, settitulo] = useState('');
@@ -29,6 +29,8 @@ const CreatePostScreen = () => {
 
   const { userId } = useLogin();
 
+
+  console.log(userId)
   useEffect(() => {
     (async () => {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -38,55 +40,37 @@ const CreatePostScreen = () => {
     })();
   }, []);
 
-  const convertImageToBase64 = async (imageUri) => {
-    try {
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-      const base64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-      return base64;
-    } catch (error) {
-      console.error('Erro ao converter imagem para base64:', error);
-      throw error;
-    }
-  };
-
   const handleCreatePost = async () => {
     // Verificar se os campos obrigatórios foram preenchidos
     if (!imagem) {
       setErrorImage('Selecione uma imagem para a publicação');
-      return;
     } else {
       setErrorImage('');
     }
 
     if (!titulo) {
       setErrortitulo('Preencha o campo de título.');
-      return;
     } else {
       setErrortitulo('');
     }
 
     if (!descricao) {
       setErrorDescricao('Preencha o campo de descrição.');
-      return;
     } else {
       setErrorDescricao('');
     }
 
-    try {
-      const isBase64 = imagem.startsWith('data:image');
-      const imageData = isBase64 ? imagem : await convertImageToBase64(imagem);
+    // Verificar se algum dos campos está vazio
+    if (!imagem || !titulo || !descricao) {
+      return;
+    }
 
+    try {
       // Criar um objeto com os dados da postagem
       const postData = {
         titulo: titulo,
         descricao: descricao,
-        imagem: imageData,
+        imagem: imagem,
         codusuario: userId,
       };
 
@@ -113,6 +97,7 @@ const CreatePostScreen = () => {
     }
   };
 
+
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -121,15 +106,15 @@ const CreatePostScreen = () => {
         aspect: [4, 3],
         quality: 1,
       });
-  
+
       if (!result.canceled) {
         setImagem(result.uri);
-        setErrorImage('');
+        setErrorImage(''); 
       }
     } catch (error) {
       console.error('Erro ao escolher imagem da galeria:', error);
     }
-  };  
+  };
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -172,7 +157,7 @@ const CreatePostScreen = () => {
             value={titulo}
             onChangeText={(text) => {
               settitulo(text);
-              setErrortitulo('');
+              setErrortitulo(''); 
             }}
           />
           {errortitulo ? <Text style={styles.errorText}>{errortitulo}</Text> : null}
@@ -187,7 +172,7 @@ const CreatePostScreen = () => {
             value={descricao}
             onChangeText={(text) => {
               setDescricao(text);
-              setErrorDescricao('');
+              setErrorDescricao(''); 
             }}
           />
           {errorDescricao ? <Text style={styles.errorText}>{errorDescricao}</Text> : null}
@@ -197,12 +182,19 @@ const CreatePostScreen = () => {
           <Text style={styles.postButtonText}>Postar</Text>
         </TouchableOpacity>
 
-        <Modal transparent={true} visible={modalVisible} onRequestClose={closeModal}>
+        <Modal
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={closeModal}
+        >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <AntDesign name="checkcircle" size={128} color="#FFA500" />
               <Text style={styles.modalText}>Publicação concluída com sucesso!</Text>
-              <TouchableHighlight style={styles.okButton} onPress={closeModal}>
+              <TouchableHighlight
+                style={styles.okButton}
+                onPress={closeModal}
+              >
                 <Text style={styles.okButtonText}>OK</Text>
               </TouchableHighlight>
             </View>
@@ -212,6 +204,7 @@ const CreatePostScreen = () => {
     </TouchableWithoutFeedback>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -244,6 +237,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  
   previewImage: {
     width: '100%',
     height: 200,
@@ -316,6 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   okButtonText: {
+    
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',

@@ -12,11 +12,13 @@ import {
   Image,
   KeyboardAvoidingView,
 } from 'react-native';
+import { useLogin } from '../context/LoginProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 function ChatPrincipal() {
+  const {userId } = useLogin();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -25,7 +27,7 @@ function ChatPrincipal() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io('http://10.32.3.108:3000', {
+    socketRef.current = io('http://192.168.1.57:3000', {
       reconnection: true,
     });
 
@@ -46,14 +48,14 @@ function ChatPrincipal() {
       const newMessage = {
         text: message,
         isUserMessage: true,
-        // Adicione informações adicionais da mensagem, se necessário, como 'ip' e 'isReceivedImage'
+        userId:`https://cima-production.up.railway.app/usuario/${userId}`, 
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
-
+  
       socketRef.current.emit('chat message', newMessage);
       setMessage('');
     }
   };
-
   const clearMessagesLocally = async () => {
     if (messages.length === 0) {
       Alert.alert('Sem mensagens para apagar.');
@@ -143,27 +145,29 @@ function ChatPrincipal() {
         </TouchableOpacity>
       </View>
       <FlatList
-        style={styles.messageList}
-        data={messages}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onLongPress={() => handleLongPress(item)}
-            style={[
-              styles.messageContainer,
-              item.isUserMessage ? styles.userMessageContainer : styles.receiverMessageContainer,
-              isReceivedImage(item) ? styles.receivedImageContainer : null,
-            ]}
-          >
-            {isReceivedImage(item) ? (
-              <Image source={{ uri: item.imageURL }} style={styles.receivedImage} />
-            ) : (
-              <Text style={styles.messageText}>{item.text}</Text>
-            )}
-            <Text style={styles.timestampText}>{item.timestamp}</Text>
-          </TouchableOpacity>
-        )}
-      />
+  style={styles.messageList}
+  data={messages}
+  keyExtractor={(item, index) => index.toString()}
+  renderItem={({ item }) => (
+<TouchableOpacity
+  onLongPress={() => handleLongPress(item)}
+  style={[
+    styles.messageContainer,
+    item.userId === `https://cima-production.up.railway.app/usuario/${userId}`
+      ? styles.userMessageContainer
+      : styles.receiverMessageContainer,
+    isReceivedImage(item) ? styles.receivedImageContainer : null,
+  ]}
+>
+  {isReceivedImage(item) ? (
+    <Image source={{ uri: item.imageURL }} style={styles.receivedImage} />
+  ) : (
+    <Text style={styles.messageText}>{item.text}</Text>
+  )}
+  <Text style={styles.timestampText}>{item.timestamp}</Text>
+</TouchableOpacity>
+  )}
+/>
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -225,12 +229,13 @@ const styles = StyleSheet.create({
   },
   userMessageContainer: {
     alignSelf: 'flex-end',
-    backgroundColor: '#cccccc',
+    backgroundColor: '#1C3977', // Cor de fundo para mensagens enviadas pelo usuário
   },
+  
   receiverMessageContainer: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#EFEFEF',
-  },
+    alignSelf: 'flex-start',
+    backgroundColor: '#EFEFEF', // Cor de fundo para mensagens recebidas
+  },  
   receivedImageContainer: {
     alignSelf: 'flex-start',
     backgroundColor: '#EFEFEF',

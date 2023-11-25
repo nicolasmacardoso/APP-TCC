@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text as RNText } from 'react-native';
 
 const FormSubmitButton = ({ title, submitting, onPress }) => {
   const backgroundColor = submitting
@@ -11,7 +11,7 @@ const FormSubmitButton = ({ title, submitting, onPress }) => {
       onPress={!submitting ? onPress : null}
       style={[styles.container, { backgroundColor }]}
     >
-      <Text style={{ fontSize: 18, color: '#fff' }}>{title}</Text>
+      <RNText style={{ fontSize: 18, color: '#fff', fontFamily: 'Inter-bold' }}>{title}</RNText>
     </TouchableOpacity>
   );
 };

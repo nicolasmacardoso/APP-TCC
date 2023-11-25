@@ -3,20 +3,34 @@ import { Animated, View, ScrollView, StyleSheet, Text, TextInput, Dimensions, Im
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 
-if (!global.btoa) {
-  global.btoa = encode;
-}
-
-if (!global.atob) {
-  global.atob = decode;
-}
-
 const windowWidth = Dimensions.get('window').width;
 
 const App = () => {
   const [posts, setPosts] = useState([]);
-  const [nome, setNome] = useState([]);
+  const [userNames, setUserNames] = useState([]);
   const [scrollY, setScrollY] = useState(new Animated.Value(0));
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('https://cima-production.up.railway.app/postagem');
+        console.log('Resposta da API:', response.data);
+        setPosts(response.data);
+
+        const userNamesPromises = response.data.map(async (post) => {
+          const userResponse = await axios.get(`https://cima-production.up.railway.app/usuario/${post.id}`);
+          return userResponse.data.usuario || 'Nome Desconhecido';
+        });
+
+        const userNamesResult = await Promise.all(userNamesPromises);
+        setUserNames(userNamesResult);
+      } catch (error) {
+        console.error('Erro ao buscar postagens:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const decodeBase64Image = (base64String) => {
     if (!base64String) {
@@ -26,20 +40,6 @@ const App = () => {
     const uri = `data:image/jpeg;base64,${base64String}`;
     return uri;
   };
-  useEffect(() => {
-    axios.get('https://cima-production.up.railway.app/postagem')
-      .then(response => {
-        console.log('Resposta da API:', response.data);
-        setPosts(response.data);
-      })
-      .catch(error => console.error('Erro ao buscar postagens:', error));
-
-      axios.get(`https://cima-production.up.railway.app/usuario/${posts.id}`)
-      .then(response => {
-        setNome(response.data);
-      })
-      .catch(error => console.error('Erro ao buscar postagens:', error));
-  }, []);
 
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
@@ -63,7 +63,7 @@ const App = () => {
   };
 
   const headerHeight = scrollY.interpolate({
-    inputRange: [0, 50], // Ou qualquer valor desejado
+    inputRange: [0, 50],
     outputRange: [70, 20],
     extrapolate: 'clamp',
   });
@@ -88,11 +88,11 @@ const App = () => {
         scrollEventThrottle={16}
       >
         <View style={styles.postContainer}>
-          {posts.map((post) => (
+          {posts.map((post, index) => (
             <View key={post.id} style={styles.post}>
               <Image source={{ uri: decodeBase64Image(post.imageUrl) }} style={styles.postImage} />
               <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.descricao}</Text>
-              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)} • {nome.usuario}</Text>
+              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)} • {userNames[index]}</Text>
             </View>
           ))}
         </View>

@@ -23,6 +23,7 @@ function ChatPrincipal() {
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [userName, setUserName] = useState('');
 
   const socketRef = useRef(null);
 
@@ -48,13 +49,22 @@ function ChatPrincipal() {
       const newMessage = {
         text: message,
         isUserMessage: true,
-        userId:`https://cima-production.up.railway.app/usuario/${userId}`, 
+        userName: profile.nome,
+        userId: `https://cima-production.up.railway.app/usuario/${userId}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
-  
+
       socketRef.current.emit('chat message', newMessage);
       setMessage('');
     }
+  };
+  const newMessage = {
+    text: message,
+    isUserMessage: true,
+    userName: profile.nome,
+    userId: `https://cima-production.up.railway.app/usuario/${userId}`,
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    deleted: false, // Adicione este campo
   };
   const clearMessagesLocally = async () => {
     if (messages.length === 0) {
@@ -119,79 +129,99 @@ function ChatPrincipal() {
     setModalVisible(true);
   };
 
-  const handleDeleteMessage = async () => {
-    if (selectedMessage) {
-      try {
-        const updatedMessages = messages.filter((msg) => msg !== selectedMessage);
-        await AsyncStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
-        setMessages(updatedMessages);
-        setSelectedMessage(null);
-        setModalVisible(false);
-      } catch (error) {
-        console.error('Erro ao excluir mensagem localmente:', error);
-      }
+const handleDeleteMessage = async () => {
+  if (selectedMessage && !selectedMessage.deleted) {
+    try {
+      const deleteMessage = {
+        text: 'Esta mensagem foi excluída.',
+        isUserMessage: true,
+        userName: profile.nome,
+        userId: `https://cima-production.up.railway.app/usuario/${userId}`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        deleted: true,
+      };
+  
+      // Enviar a mensagem especial indicando exclusão apenas para o usuário local
+      socketRef.current.emit('chat message', deleteMessage);
+  
+      // Atualizar a lista local, marcando a mensagem como excluída apenas para o usuário local
+      const updatedMessages = messages.map((msg) =>
+        msg === selectedMessage && msg.userId === `https://cima-production.up.railway.app/usuario/${userId}`
+          ? { ...msg, text: 'Esta mensagem foi excluída.', deleted: true }
+          : msg
+      );
+  
+      await AsyncStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
+      setMessages(updatedMessages);
+  
+      setSelectedMessage(null);
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Erro ao excluir mensagem localmente:', error);
     }
-  };
+  }
+};
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={clearMessagesLocally}>
-          <Icon name="trash" size={24} color="black" style={styles.trashIcon} />
-        </TouchableOpacity>
-      </View>
-      <FlatList
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={clearMessagesLocally}>
+            <Icon name="trash" size={24} color="black" style={styles.trashIcon} />
+          </TouchableOpacity>
+        </View>
+        <FlatList
   style={styles.messageList}
-  data={messages}
+  data={messages.filter((msg) => !msg.deleted)}
   keyExtractor={(item, index) => index.toString()}
   renderItem={({ item }) => (
-<TouchableOpacity
-  onLongPress={() => handleLongPress(item)}
-  style={[
-    styles.messageContainer,
-    item.userId === `https://cima-production.up.railway.app/usuario/${userId}`
-      ? styles.userMessageContainer
-      : styles.receiverMessageContainer,
-    isReceivedImage(item) ? styles.receivedImageContainer : null,
-  ]}
->
-  {isReceivedImage(item) ? (
-    <Image source={{ uri: item.imageURL }} style={styles.receivedImage} />
-  ) : (
-    <Text style={styles.messageText}>{item.text}</Text>
-  )}
-  <Text style={styles.timestampText}>{item.timestamp}</Text>
-</TouchableOpacity>
-  )}
-/>
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.actionButton} onPress={handleDeleteMessage}>
-              <Text style={styles.actionButtonText}>Excluir</Text>
+    <TouchableOpacity
+      onLongPress={() => handleLongPress(item)}
+      style={[
+        styles.messageContainer,
+        item.userId === `https://cima-production.up.railway.app/usuario/${userId}`
+          ? styles.userMessageContainer
+          : styles.receiverMessageContainer,
+        isReceivedImage(item) ? styles.receivedImageContainer : null,
+      ]}
+    >
+              <Text style={styles.userNameText}>{item.userName}</Text>
+              {isReceivedImage(item) ? (
+                <Image source={{ uri: item.imageURL }} style={styles.receivedImage} />
+              ) : (
+                <Text style={styles.messageText}>{item.text}</Text>
+              )}
+              <Text style={styles.timestampText}>{item.timestamp}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton} onPress={() => setModalVisible(false)}>
-              <Text style={styles.actionButtonText}>Fechar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite sua mensagem"
-          value={message}
-          onChangeText={(text) => setMessage(text)}
+  )}
         />
-        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Text style={styles.sendButtonText}>Enviar</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+        <Modal animationType="slide" transparent={true} visible={modalVisible}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity style={styles.actionButton} onPress={handleDeleteMessage}>
+                <Text style={styles.actionButtonText}>Excluir</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.actionButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.actionButtonText}>Fechar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite sua mensagem"
+            value={message}
+            onChangeText={(text) => setMessage(text)}
+          />
+          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+            <Text style={styles.sendButtonText}>Enviar</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
@@ -229,13 +259,18 @@ const styles = StyleSheet.create({
   },
   userMessageContainer: {
     alignSelf: 'flex-end',
-    backgroundColor: '#1C3977', // Cor de fundo para mensagens enviadas pelo usuário
+    backgroundColor: '#D1E1FC', // Cor de fundo para mensagens enviadas pelo usuário
   },
-  
+  userNameText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2E3E5C',
+    marginBottom: 4,
+  },
   receiverMessageContainer: {
     alignSelf: 'flex-start',
-    backgroundColor: '#EFEFEF', // Cor de fundo para mensagens recebidas
-  },  
+    backgroundColor: '#FFE2D1', // Cor de fundo para mensagens recebidas
+  },
   receivedImageContainer: {
     alignSelf: 'flex-start',
     backgroundColor: '#EFEFEF',

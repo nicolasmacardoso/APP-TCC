@@ -1,17 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  SafeAreaView,
-  Alert,
-  Modal,
-  Image,
-  KeyboardAvoidingView,
-} from 'react-native';
+import {View,Text,StyleSheet,TextInput,TouchableOpacity,FlatList,SafeAreaView,Alert,Modal,Image,KeyboardAvoidingView,} from 'react-native';
 import { useLogin } from '../context/LoginProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
@@ -68,35 +56,6 @@ function ChatPrincipal() {
     userId: `https://cima-production.up.railway.app/usuario/${userId}`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     bairro: profile.bairro, 
-  };
-  const clearMessagesLocally = async () => {
-    if (messages.length === 0) {
-      Alert.alert('Sem mensagens para apagar.');
-      return;
-    }
-
-    Alert.alert(
-      'Confirmar exclusão',
-      'Tem certeza de que deseja apagar todas as mensagens permanentemente?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Apagar',
-          onPress: async () => {
-            try {
-              await AsyncStorage.removeItem('chatMessages');
-              setMessages([]);
-            } catch (error) {
-              console.error('Erro ao apagar mensagens localmente:', error);
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
   };
 
   const saveMessageLocally = async (message) => {
@@ -170,20 +129,15 @@ function ChatPrincipal() {
       style={styles.container}
     >
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={clearMessagesLocally}>
-            <Icon name="trash" size={24} color="black" style={styles.trashIcon} />
-          </TouchableOpacity>
-        </View>
-        <FlatList
+      <FlatList
   style={styles.messageList}
   data={messages.filter(
     (msg) =>
-      !msg.deleted && // Verificar se a mensagem não foi excluída
+      !msg.deleted &&
       (msg.bairro === profile.bairro || msg.userId === `https://cima-production.up.railway.app/usuario/${userId}`)
   )}
   keyExtractor={(item, index) => index.toString()}
-  renderItem={({ item }) => (
+  renderItem={({ item, index }) => (
     <TouchableOpacity
       onLongPress={() => handleLongPress(item)}
       style={[
@@ -192,6 +146,7 @@ function ChatPrincipal() {
           ? styles.userMessageContainer
           : styles.receiverMessageContainer,
         isReceivedImage(item) ? styles.receivedImageContainer : null,
+        index === 0 ? styles.firstMessage : null, // Adicione o estilo firstMessage à primeira mensagem
       ]}
     >
       <Text style={styles.userNameText}>{item.userName}</Text>
@@ -261,7 +216,7 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 8,
     minWidth: 100,
-    alignSelf: 'flex-end',
+
   },
   userMessageContainer: {
     alignSelf: 'flex-end',
@@ -336,5 +291,8 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 16,
     color: 'black',
+  },
+  firstMessage: {
+    marginTop: 16, // ou qualquer valor de margem superior desejado
   },
 });

@@ -81,7 +81,7 @@ const LoginProvider = ({ children }) => {
         profileImageCallback(newImage);
       }
 
-      setProfileUpdateKey((prevKey) => prevKey + 1);
+      setProfileUpdateKey((prevKey) => prevKey + 2);
     } catch (error) {
       console.error('Erro ao atualizar imagem do perfil:', error);
     }

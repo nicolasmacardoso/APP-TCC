@@ -6,16 +6,21 @@ import UserProfile from './components/UserProfile';
 import { useLogin } from './context/LoginProvider';
 import DrawerNavigator from './DrawerNavigator';
 import SplashScreen from './components/Comecar';
+import Postagem from './components/Postagem'; // Importe a tela de postagem
+import Home from './components/Home';
+import App from '../App';
 
 const Stack = createStackNavigator();
 
 const StackNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen component={SplashScreen} name='SplashScreen' />
-      <Stack.Screen component={AppForm} name='AppForm' />
-      <Stack.Screen component={UserProfile} name='UserProfile' />
-    </Stack.Navigator>
+    <Stack.Navigator initialRouteName='SplashScreen' screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Postagem" component={Postagem} />
+      <Stack.Screen name="SplashScreen" component={SplashScreen} />
+      <Stack.Screen name="AppForm" component={AppForm} />
+      <Stack.Screen name="UserProfile" component={UserProfile} />
+  </Stack.Navigator>
   );
 };
 

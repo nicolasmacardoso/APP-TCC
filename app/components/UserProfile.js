@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Text, Dimensions, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useLogin } from '../context/LoginProvider';
 import { FontAwesome } from '@expo/vector-icons'; 
@@ -7,27 +7,31 @@ import axios from 'axios';
 
 const Perfil = () => {
   const { profile, userId, registerProfileImageCallback, updateProfileImage } = useLogin();
-  const [userName, setUserName] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [refreshKey, setRefreshKey] = useState(0); // Novo estado para forçar remontagem
-
-  const [posts, setPosts] = useState([
-    { id: 1, content: 'Post 1 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/200/200', author: 'Alice' },
-    { id: 2, content: 'Post 2', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/201/201', author: 'Bob' },
-    { id: 3, content: 'Post 3 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/202/202', author: 'Charlie' },
-    { id: 4, content: 'Post 4', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/203/203', author: 'David' },
-    { id: 5, content: 'Post 5 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/204/204', author: 'Eva' },
-    { id: 6, content: 'Post 6', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/205/205', author: 'Frank' },
-    { id: 7, content: 'Post 7 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/206/206', author: 'Grace' },
-    { id: 8, content: 'Post 8', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/207/207', author: 'Henry' },
-    { id: 9, content: 'Post 9 com um título mais longo para testar a quebra de linha', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/208/208', author: 'Ivy' },
-    { id: 10, content: 'Post 10', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/209/209', author: 'Jack' },
-    { id: 11, content: 'Post 11', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/210/210', author: 'Karen' },
-    { id: 12, content: 'Post 12', timestamp: new Date().toISOString(), imageUrl: 'https://placekitten.com/210/210', author: 'Leo' },
-  ]);
+  const [posts, setPosts] = useState([]);
 
   const base64ToImage = (base64) => {
     return `data:image/jpeg;base64,${base64}`;
+  };
+
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const postTime = new Date(timestamp);
+    const timeDiff = now - postTime;
+    const minutes = Math.floor(timeDiff / (1000 * 60));
+
+    if (minutes < 60) {
+      return `${minutes} min ago`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) {
+        return `${hours}h ago`;
+      } else {
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+      }
+    }
   };
 
   useEffect(() => {
@@ -42,10 +46,8 @@ const Perfil = () => {
       avatar: profile.imagem,
     };
   
-    setUserName(profileData.usuario);
     setProfileImage(base64ToImage(profileData.avatar));
   }, [profile]);
-  
 
   useEffect(() => {
     console.log('UserProfile - Setting profileImage callback');
@@ -60,6 +62,76 @@ const Perfil = () => {
       registerProfileImageCallback(null);
     };
   }, [refreshKey]);
+
+  useEffect(() => {
+    // Lógica para obter as postagens do usuário
+    const fetchPosts = async () => {
+      try {
+        const apiUrl = `https://cima-production.up.railway.app/postagem?codusuario=${userId}`;
+        console.log(`Trying to fetch posts from: ${apiUrl}`);
+  
+        const response = await axios.get(apiUrl);
+        setPosts(response.data);
+      } catch (error) {
+        console.error('Erro ao obter postagens:', error);
+      }
+    };
+
+    fetchPosts();
+    const intervalId = setInterval(fetchPosts, 5000);
+
+    // Limpa o intervalo quando o componente é desmontado para evitar vazamentos de memória
+    return () => clearInterval(intervalId);
+  }, [userId]);
+  
+
+  const pickImage = async () => {
+    try {
+      const options = {
+        mediaType: 'photo',
+        quality: 0.05,
+        allowsEditing: true,
+        aspect: [1, 1],
+        storageOptions: {
+          skipBackup: true,
+          path: 'images',
+        },
+      };
+
+      const result = await ImagePicker.launchImageLibraryAsync(options);
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const selectedImageUri = result.assets[0].uri;
+
+        const base64Image = await convertImageToBase64(selectedImageUri);
+
+        const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}`, 
+        { 
+          imagem: base64Image,
+          nome: profile.nome,
+          usuario: profile.usuario,
+          senha: profile.senha,
+          email: profile.email,
+          cpf: profile.cpf,
+          numero_casa: profile.numero_casa,
+          rua: profile.rua,
+          complemento: profile.complemento,
+          codbairro: profile.codbairro,
+        });
+
+        if (response.status === 200) {
+          updateProfileImage(base64Image);
+
+          console.log('UserProfile - Callback after updating image called');
+          Alert.alert('Imagem atualizada com sucesso!');
+        } else {
+          Alert.alert('Erro ao enviar a imagem', 'A imagem não pôde ser enviada.');        
+        }
+      }
+    } catch (error) {
+      Alert.alert('Erro ao selecionar a imagem', error.message);
+    }
+  };
 
   const renderProfileImage = () => {
     if (profileImage) {
@@ -97,55 +169,6 @@ const Perfil = () => {
     }
   };
 
-  const pickImage = async () => {
-    try {
-      const options = {
-        mediaType: 'photo',
-        quality: 0.5,
-        allowsEditing: true,
-        aspect: [1, 1],
-        storageOptions: {
-          skipBackup: true,
-          path: 'images',
-        },
-      };
-
-      const result = await ImagePicker.launchImageLibraryAsync(options);
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const selectedImageUri = result.assets[0].uri;
-
-        const base64Image = await convertImageToBase64(selectedImageUri);
-
-        const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}`, 
-        { 
-          imagem: base64Image,
-          nome: profile.nome,
-          usuario: userName,
-          senha: profile.senha,
-          email: profile.email,
-          cpf: profile.cpf,
-          numero_casa: profile.numero_casa,
-          rua: profile.rua,
-          complemento: profile.complemento,
-          codbairro: profile.codbairro,
-        });
-
-        if (response.status === 200) {
-          // Chama a função de atualização de imagem no contexto
-          updateProfileImage(base64Image);
-
-          console.log('UserProfile - Callback after updating image called');
-          Alert.alert('Imagem atualizada com sucesso!');
-        } else {
-          Alert.alert('Erro ao enviar a imagem', 'A imagem não pôde ser enviada.');        
-        }
-      }
-    } catch (error) {
-      Alert.alert('Erro ao selecionar a imagem', error.message);
-    }
-  };
-
   return (
     <ScrollView 
       style={styles.container}
@@ -157,7 +180,7 @@ const Perfil = () => {
             {renderProfileImage()}
           </TouchableOpacity>
         </View>
-        <Text style={styles.profileName}>{userName}</Text>
+        <Text style={styles.profileName}>{profile.usuario}</Text>
         <Text style={styles.profileNome}>{profile.nome}</Text>
         <View style={styles.publicationsContainer}>
           <Text style={styles.publicationsText}> Minhas Publicações</Text>
@@ -168,33 +191,14 @@ const Perfil = () => {
       <View style={styles.postContainer}>
         {posts.map((post) => (
           <View key={post.id} style={styles.post}>
-            <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
-            <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.content}</Text>
-            <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)} • {post.author}</Text>
+            <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
+            <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
+            <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)}</Text>
           </View>
         ))}
       </View>
     </ScrollView>
   );
-};
-
-const formatTimeAgo = (timestamp) => {
-  const now = new Date();
-  const postTime = new Date(timestamp);
-  const timeDiff = now - postTime;
-  const minutes = Math.floor(timeDiff / (1000 * 60));
-
-  if (minutes < 60) {
-    return `${minutes} min ago`;
-  } else {
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-      return `${hours}h ago`;
-    } else {
-      const days = Math.floor(hours / 24);
-      return `${days}d ago`;
-    }
-  }
 };
 
 const styles = StyleSheet.create({
@@ -206,7 +210,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#304269',
     height: '100%', // Ajuste conforme necessário
     position: 'absolute',
-    top: -205,
+    top: -210,
     left: 0,
     right: 0,
   },
@@ -282,7 +286,7 @@ const styles = StyleSheet.create({
     width: 230,
     height: 3,
     backgroundColor: '#F26101',
-    marginTop: 0,
+    marginTop: 5,
     marginLeft: 5,
     position: 'fixed',
     bottom: -24,

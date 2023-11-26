@@ -145,7 +145,9 @@ const CreatePostScreen = () => {
         contentContainerStyle={styles.container}
         extraScrollHeight={Platform.select({ ios: 150, android: 0 })}
         enableOnAndroid
+        bounces={false}
       >
+        <View style={styles.blueBackground}></View>
         <Text style={styles.titulo}>Criar Publicação</Text>
 
         <View style={styles.formContainer}>
@@ -234,9 +236,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-bold',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 16,
-    marginTop: -20,
-    color: '#F26101', // Marrom
+    marginBottom: 70,
+    marginTop: 20,
+    color: '#fff', // Marrom
+  },
+  blueBackground: {
+    backgroundColor: '#304269',
+    height: 180,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: -1,
   },
   formContainer: {
     marginTop: 40,
@@ -299,7 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginHorizontal: 16,
     marginBottom: 16,
-    marginTop: 100,
+    marginTop: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -307,6 +318,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Inter-bold',
   },
   modalContainer: {
     flex: 1,
@@ -347,7 +359,7 @@ const styles = StyleSheet.create({
   okButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Inter-bold',
     textAlign: 'center',
     width: 100,
   },

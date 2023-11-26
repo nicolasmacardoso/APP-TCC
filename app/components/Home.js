@@ -1,51 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { Animated, View, ScrollView, StyleSheet, Text, TextInput, Dimensions, Image } from 'react-native';
+import { Animated, View, ScrollView, StyleSheet, Text, TextInput, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 
 const windowWidth = Dimensions.get('window').width;
 
-const App = () => {
+const Home = () => {
+  const navigation = useNavigation();
+
   const [posts, setPosts] = useState([]);
   const [scrollY, setScrollY] = useState(new Animated.Value(0));
+  const [userNames, setUserNames] = useState({});
 
   const base64ToImage = (base64) => {
     return `data:image/jpeg;base64,${base64}`;
+  };
+
+  const fetchUserData = async (codusuario) => {
+    try {
+      const userResponse = await axios.get(`https://cima-production.up.railway.app/usuario/${codusuario}`);
+      const userName = userResponse.data.nome;
+/*    console.log('Nome do usuário obtido com sucesso:', userName);*/    
+} catch (error) {
+      console.error('Erro ao obter dados do usuário:', error);
+      return 'Usuário Desconhecido';
+    }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('https://cima-production.up.railway.app/postagem');
-
         const postsWithUserDetails = await Promise.all(
           response.data.map(async (post) => {
             try {
-              const userResponse = await axios.get(`https://cima-production.up.railway.app/usuario/${post.codusuario}`);
-              console.log(post.codusuario, "oii");
-              const userDetails = userResponse.data[0];
-              const usuario = userDetails ? userDetails.usuario : "Nome de usuário não disponível3";
-
-              return { ...post, usuario };
+              const userName = await fetchUserData(post.codusuario);
+              if (userName !== null) {
+                return { ...post, userName };
+              } else {
+                return post;
+              }
             } catch (userError) {
-              return { ...post, usuario: "Nome de usuário não disponível2" };
+              console.error('Erro ao obter detalhes do usuário:', userError);
+              return { ...post, userName: 'Usuário Desconhecido' };
             }
           })
         );
-
         setPosts(postsWithUserDetails);
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
       }
     };
 
-    // Fetch data initially
     fetchData();
 
-    // Poll for new data every 5 seconds (adjust the interval as needed)
-    const intervalId = setInterval(fetchData, 1000);
+    const intervalId = setInterval(fetchData, 5000);
 
-    // Clean up the interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
@@ -54,7 +65,6 @@ const App = () => {
     const postTime = new Date(timestamp);
     const timeDiff = now - postTime;
 
-    // Convert timeDiff to minutes
     const minutes = Math.floor(timeDiff / (1000 * 60));
 
     if (minutes < 60) {
@@ -98,11 +108,20 @@ const App = () => {
       >
         <View style={styles.postContainer}>
           {posts.map((post) => (
+             <TouchableWithoutFeedback
+             key={post.id}
+             onPress={() => navigation.navigate('Postagem', { postId: post.id })}
+             >
             <View key={post.id} style={styles.post}>
+              <View style={styles.postHeader}>
+                <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.userImage} />
+                <Text style={styles.postAutor} numberOfLines={1}>{post.userName}</Text>
+              </View>
+              <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
               <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
-              <Text style={styles.postInfo}>{post.usuario}</Text>
-              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)}</Text>
+              <Text style={styles.postInfo}>Postado a {formatTimeAgo(post.timestamp)}</Text>
             </View>
+            </TouchableWithoutFeedback>
           ))}
         </View>
       </ScrollView>
@@ -126,13 +145,14 @@ const styles = StyleSheet.create({
   searchIcon: {
     position: 'absolute',
     left: 70,
-    top: 89,
+    top: 109,
   },
   searchInput: {
     flex: 1,
     backgroundColor: '#fff',
     fontSize: 20,
     height: 60,
+    marginTop: 20,
     borderRadius: 50,
     paddingLeft: 60,
   },
@@ -141,32 +161,52 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: 20,
   },
   post: {
     width: '48%',
     aspectRatio: 0.7,
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 30,
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  userImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 5, // Ajuste conforme necessário
+    marginRight: 8,
   },
   postImage: {
     width: '100%',
     height: '70%',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    borderRadius: 16,
     resizeMode: 'cover',
   },
   postTitle: {
-    fontSize: 16,
+    fontSize: 17,
+    color: '#3E5481',
+    fontFamily: 'Inter-Extrabold',
     fontWeight: 'bold',
     padding: 8,
-    textAlign: 'center',
+    paddingLeft: -8,
+    textAlign: 'left',
   },
   postInfo: {
     fontSize: 12,
-    color: '#000',
+    color: '#9FA5C0',
+    textAlign: 'left',
+  },
+  postAutor: {
+    fontSize: 13,
+    width: 140,
+    color: '#3E5481',
+    fontFamily: 'Inter-Medium',
     textAlign: 'center',
   },
 });
 
-export default App;
+export default Home;

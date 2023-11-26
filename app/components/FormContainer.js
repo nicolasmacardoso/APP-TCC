@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: Dimensions.get('window').width,
     paddingHorizontal: 20,
-    marginTop: 70,
+    marginTop: 50,
   },
 });
 

@@ -34,11 +34,10 @@ const LoginForm = () => {
           updateError('Sua senha não condiz com seu email.', setError);
         }
       } else {
-        updateError('Usuário não encontrado. Verifique seu email.', setError);
+        updateError('Usuário não encontrado. Verifique seu .', setError);
       }
     } catch (error) {
-      console.error('Error:', error.message);
-      updateError('Usuário não encontrado. Verifique seu email.', setError);
+      updateError('Login inválido. Verifique seu email ou senha.', setError);
     } finally {
       formikActions.setSubmitting(false);
     }

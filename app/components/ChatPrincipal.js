@@ -29,7 +29,7 @@ function ChatPrincipal() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io('http://192.168.1.57:3000', {
+    socketRef.current = io('http://192.168.0.114:3000', {
       reconnection: true,
     });
 

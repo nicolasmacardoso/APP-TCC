@@ -6,7 +6,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 
 const Perfil = () => {
-  const { profile, userId, registerProfileImageCallback, updateProfileImage } = useLogin();
+  const { profileUpdateKey, profile, userId, registerProfileImageCallback, updateProfileImage } = useLogin();
   const [profileImage, setProfileImage] = useState('');
   const [refreshKey, setRefreshKey] = useState(0); // Novo estado para forçar remontagem
   const [posts, setPosts] = useState([]);
@@ -14,7 +14,7 @@ const Perfil = () => {
   const base64ToImage = (base64) => {
     return `data:image/jpeg;base64,${base64}`;
   };
-
+  
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
     const postTime = new Date(timestamp);
@@ -61,15 +61,15 @@ const Perfil = () => {
     return () => {
       registerProfileImageCallback(null);
     };
-  }, [refreshKey]);
+  }, [profileUpdateKey, userId]);
 
   useEffect(() => {
     // Lógica para obter as postagens do usuário
     const fetchPosts = async () => {
       try {
         const apiUrl = `https://cima-production.up.railway.app/postagem?codusuario=${userId}`;
-        console.log(`Trying to fetch posts from: ${apiUrl}`);
-  
+/*         console.log(`Trying to fetch posts from: ${apiUrl}`);
+ */  
         const response = await axios.get(apiUrl);
         setPosts(response.data);
       } catch (error) {
@@ -134,7 +134,7 @@ const Perfil = () => {
   };
 
   const renderProfileImage = () => {
-    if (profileImage) {
+    if (profileImage.length > 100) {
       return (
         <Image
           source={{ uri: profileImage }}

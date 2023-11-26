@@ -77,7 +77,7 @@ const SignupForm = ({}) => {
           <Text style={{ color: 'red', fontSize: 18, textAlign: 'center' }}>
             {error}
           </Text>
-        ) : null}
+        ) : null}  
         {successMessage ? (
           <Text style={{ color: 'green', fontSize: 18, textAlign: 'center' }}>
             {successMessage}
@@ -256,7 +256,6 @@ const SignupForm = ({}) => {
           )}
         </Formik>
       </FormContainer>
-      
   );
 };
 

@@ -37,29 +37,39 @@ const LoginProvider = ({ children }) => {
   const login = async (user) => {
     try {
       await AsyncStorage.setItem('@user', JSON.stringify(user));
-
+  
       setProfile(user);
       setUserId(user.id);
       setProfileImagem(user.imagem);
-
+  
       if (profileImageCallback) {
         profileImageCallback(user.imagem);
       }
-
+  
       setIsLoggedIn(true);
     } catch (e) {
       console.error('Erro ao salvar usuário no AsyncStorage:', e);
     }
   };
 
+  const resetContext = () => {
+    try {
+      AsyncStorage.removeItem('@user');
+    } catch (e) {
+      console.error('Erro ao remover usuário do AsyncStorage:', e);
+    }
+  
+    setIsLoggedIn(false);
+    setProfile({});
+    setUserId(null);
+    setProfileImagem(null);
+    setProfileUpdateKey((prevKey) => !prevKey); // Mude o estado para forçar a atualização
+  };
+
   const logout = async () => {
     try {
       await AsyncStorage.removeItem('@user');
-
-      setProfile({});
-      setUserId(null);
-      setProfileImagem(null);
-      setIsLoggedIn(false);
+      resetContext(); // Chame a função resetContext para redefinir o contexto
     } catch (e) {
       console.error('Erro ao remover usuário do AsyncStorage:', e);
     }
@@ -76,12 +86,12 @@ const LoginProvider = ({ children }) => {
         ...prevProfile,
         imagem: newImage,
       }));
-
+  
       if (profileImageCallback) {
         profileImageCallback(newImage);
       }
-
-      setProfileUpdateKey((prevKey) => prevKey + 2);
+  
+      setProfileUpdateKey((prevKey) => prevKey);  // Mudança real no estado
     } catch (error) {
       console.error('Erro ao atualizar imagem do perfil:', error);
     }
@@ -102,6 +112,8 @@ const LoginProvider = ({ children }) => {
         userId,
         registerProfileImageCallback,
         updateProfileImage,
+        profileUpdateKey, 
+        resetContext,
       }}
     >
       {children}

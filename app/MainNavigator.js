@@ -6,9 +6,9 @@ import UserProfile from './components/UserProfile';
 import { useLogin } from './context/LoginProvider';
 import DrawerNavigator from './DrawerNavigator';
 import SplashScreen from './components/Comecar';
-import Postagem from './components/Postagem'; // Importe a tela de postagem
 import Home from './components/Home';
 import App from '../App';
+import Postagem from './components/Postagem';
 
 const Stack = createStackNavigator();
 
@@ -20,7 +20,7 @@ const StackNavigator = () => {
       <Stack.Screen name="SplashScreen" component={SplashScreen} />
       <Stack.Screen name="AppForm" component={AppForm} />
       <Stack.Screen name="UserProfile" component={UserProfile} />
-  </Stack.Navigator>
+    </Stack.Navigator>
   );
 };
 

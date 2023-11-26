@@ -16,7 +16,7 @@ import UserProfile from './components/UserProfile';
 const Drawer = createDrawerNavigator();
 
 const CustomDrawer = (props) => {
-  const { setIsLoggedIn, profile, registerProfileImageCallback } = useLogin();
+  const { setIsLoggedIn, profile, registerProfileImageCallback, logout } = useLogin();
   const [profileImage, setProfileImage] = useState('');
 
   const base64ToImage = (base64) => {
@@ -54,7 +54,7 @@ const CustomDrawer = (props) => {
     } else {
       return (
         <View style={{ width: 80, height: 80, borderRadius: 50, backgroundColor: '#FFFFFF', borderColor: '#6180BF', borderWidth: 4}}>
-          <FontAwesome name="user-circle" size={71.999} color="#757575" />
+          <FontAwesome name="user-circle" size={72.333} color="#757575" />
         </View>
       );
     }
@@ -85,8 +85,18 @@ const CustomDrawer = (props) => {
       }
     });
     const truncatedName = filteredWords.join(' ');
+  
+    if (truncatedName.length > maxLength) {
+      return truncatedName.substring(0, maxLength)  + '...';
+    } else {
+      return truncatedName;
+    }
+  };
 
-    return truncatedName.substring(0, maxLength)  + '...';
+  const logoutHandler = async () => {
+    await logout(); // Chama a função logout para realizar as ações de logout necessárias
+    // Outras ações de logout que você pode precisar fazer
+    setIsLoggedIn(false); // Defina o estado de login como falso
   };
 
   return (
@@ -98,8 +108,10 @@ const CustomDrawer = (props) => {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: 24,
+            paddingTop: 100,
             backgroundColor: '#304269',
-            marginBottom: 20,
+            marginTop: -76,
+            marginBottom: 50,
           }}
         >
           {renderProfileImage()}
@@ -123,7 +135,7 @@ const CustomDrawer = (props) => {
           backgroundColor: '#304269',
           padding: 20,
         }}
-        onPress={() => setIsLoggedIn(false)}
+        onPress={logoutHandler}
       >
         <Text  style={{fontSize: 20, color: '#fff', fontFamily: 'Inter-bold', paddingLeft: 50}}>Sair</Text>
       </TouchableOpacity>
@@ -166,14 +178,22 @@ const DrawerNavigator = () => {
       screenOptions={{
         headerShown: false,
         drawerLabelStyle: {
-          color: '#000', // Cor do texto do item do menu
+          color: '#304269', // Cor do texto do item do menu
         },
         drawerActiveBackgroundColor: '#FFE2D1', // Cor de fundo quando a página está ativa
         drawerInactiveBackgroundColor: '#fff', // Cor de fundo quando a página não está ativa
       }}
       drawerContent={(props) => <CustomDrawer {...props} />}
     >
-      <Drawer.Screen component={Home} name='Home' />
+      <Drawer.Screen
+        component={Home}
+        name='Home'
+        options={{
+          drawerIcon: ({ focused, color, size }) => (
+            <FontAwesome name="home" size={size} color={color} />
+          ),
+        }}
+      />
       <Drawer.Screen component={CriarPosts} name='Criar Publicação' />
       <Drawer.Screen component={ChatPrincipal} name='Bate-Papo' />
       <Drawer.Screen component={UserProfile} name='Meu Perfil' />

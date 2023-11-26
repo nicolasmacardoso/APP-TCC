@@ -236,8 +236,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-bold',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 70,
-    marginTop: 20,
+    top: 100,
+    left: 110,
+    position: 'absolute',
     color: '#fff', // Marrom
   },
   blueBackground: {
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   formContainer: {
-    marginTop: 40,
+    marginTop: 180,
   },
   imageContainer: {
     marginBottom: 24,

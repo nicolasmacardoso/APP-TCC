@@ -20,13 +20,27 @@ const Home = () => {
   const fetchUserData = async (codusuario) => {
     try {
       const userResponse = await axios.get(`https://cima-production.up.railway.app/usuario/${codusuario}`);
-      const userName = userResponse.data.nome;
-/*    console.log('Nome do usuário obtido com sucesso:', userName);*/    
-} catch (error) {
-      console.error('Erro ao obter dados do usuário:', error);
+  
+      // Log detalhes da resposta da API
+      console.log('Resposta da API:', userResponse);
+  
+      // Verifique se a resposta contém dados
+      if (userResponse.data && userResponse.data.length > 0) {
+        const userName = userResponse.data[0].nome;
+        console.log('Nome do usuário obtido com sucesso:', userName);
+  
+        // Atualize o estado com o nome do usuário
+        return userName;
+      } else {
+        console.error('Dados do usuário não encontrados na resposta da API');
+        return 'Usuário Desconhecido';
+      }
+    } catch (error) {
+      console.error('Erro ao obter dados do usuário:', error.response?.data || error.message);
       return 'Usuário Desconhecido';
     }
   };
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +50,8 @@ const Home = () => {
           response.data.map(async (post) => {
             try {
               const userName = await fetchUserData(post.codusuario);
-              if (userName !== null) {
+              console.log(post.codusuario);
+              if (typeof userName === 'string') {
                 return { ...post, userName };
               } else {
                 return post;
@@ -110,7 +125,9 @@ const Home = () => {
           {posts.map((post) => (
              <TouchableWithoutFeedback
              key={post.id}
-             onPress={() => navigation.navigate('Postagem', { postId: post.id })}
+             onPress={() => {
+              navigation.navigate('Postagem', { postId: post.id });
+            }}
              >
             <View key={post.id} style={styles.post}>
               <View style={styles.postHeader}>

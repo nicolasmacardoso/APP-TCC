@@ -27,6 +27,10 @@
     },
     "web": {
       "favicon": "./app/Imagens/CimaLogo.png"
+    },
+    "iosInfoPlist": {
+      "NSCameraUsageDescription": "Precisamos de acesso à câmera para tirar fotos.",
+      "NSPhotoLibraryUsageDescription": "Precisamos de acesso à sua galeria de fotos para escolher imagens."
     }
   }
 }

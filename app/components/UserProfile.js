@@ -87,51 +87,99 @@ const Perfil = () => {
 
   const pickImage = async () => {
     try {
+      const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
+  
+      if (status !== 'granted') {
+        const { status: newStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (newStatus !== 'granted') {
+          throw new Error('Permission to access media library denied');
+        }
+      }
+  
       const options = {
-        mediaType: 'photo',
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 0.05,
         allowsEditing: true,
-        aspect: [1, 1],
         storageOptions: {
           skipBackup: true,
           path: 'images',
         },
       };
-
-      const result = await ImagePicker.launchImageLibraryAsync(options);
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const selectedImageUri = result.assets[0].uri;
-
-        const base64Image = await convertImageToBase64(selectedImageUri);
-
-        const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}`, 
-        { 
-          imagem: base64Image,
-          nome: profile.nome,
-          usuario: profile.usuario,
-          senha: profile.senha,
-          email: profile.email,
-          cpf: profile.cpf,
-          numero_casa: profile.numero_casa,
-          rua: profile.rua,
-          complemento: profile.complemento,
-          codbairro: profile.codbairro,
-        });
-
-        if (response.status === 200) {
-          updateProfileImage(base64Image);
-
-          console.log('UserProfile - Callback after updating image called');
-          Alert.alert('Imagem atualizada com sucesso!');
-        } else {
-          Alert.alert('Erro ao enviar a imagem', 'A imagem não pôde ser enviada.');        
-        }
+  
+      const userChoice = await new Promise((resolve) => {
+        Alert.alert(
+          'Escolha a origem da imagem',
+          'Deseja tirar uma foto agora ou escolher da galeria?',
+          [
+            { text: 'Cancelar', onPress: () => resolve(null), style: 'cancel' },
+            {
+              text: 'Tirar Foto',
+              onPress: async () => {
+                try {
+                  const { status: cameraStatus } = await ImagePicker.getCameraPermissionsAsync();
+                  if (cameraStatus !== 'granted') {
+                    const { status: newCameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+                    if (newCameraStatus !== 'granted') {
+                      throw new Error('Permission to access camera denied');
+                    }
+                  }
+  
+                  const result = await ImagePicker.launchCameraAsync(options);
+                  resolve(result);
+                } catch (error) {
+                  resolve(null);
+                }
+              },
+            },
+            {
+              text: 'Escolher da Galeria',
+              onPress: async () => {
+                const result = await ImagePicker.launchImageLibraryAsync(options);
+                resolve(result);
+              },
+            },
+          ],
+          { cancelable: true, onDismiss: () => resolve(null) }
+        );
+      });
+  
+      if (!userChoice) {
+        throw new Error('Escolha inválida');
       }
+  
+      handleImageSelection(userChoice);
     } catch (error) {
       Alert.alert('Erro ao selecionar a imagem', error.message);
     }
   };
+
+const handleImageSelection = async (result) => {
+  if (!result.cancelled) {
+    const selectedImageUri = result.uri;
+    const base64Image = await convertImageToBase64(selectedImageUri);
+
+    const response = await axios.patch(`https://cima-production.up.railway.app/usuario/${userId}`, {
+      imagem: base64Image,
+      nome: profile.nome,
+      usuario: profile.usuario,
+      senha: profile.senha,
+      email: profile.email,
+      cpf: profile.cpf,
+      numero_casa: profile.numero_casa,
+      rua: profile.rua,
+      complemento: profile.complemento,
+      codbairro: profile.codbairro,
+    });
+
+    if (response.status === 200) {
+      updateProfileImage(base64Image);
+      console.log('UserProfile - Callback after updating image called');
+      Alert.alert('Imagem atualizada com sucesso!');
+    } else {
+      Alert.alert('Erro ao enviar a imagem', 'A imagem não pôde ser enviada.');
+    }
+  }
+};
 
   const renderProfileImage = () => {
     if (profileImage.length > 100) {

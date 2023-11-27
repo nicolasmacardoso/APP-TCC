@@ -80,22 +80,32 @@ const Home = () => {
         contentContainerStyle={styles.scrollContainer}
       >
         <View style={styles.postContainer}>
-          {posts.map((post) => (
-            <TouchableWithoutFeedback
-              key={post.id}
-              onPress={() => navigation.navigate('Postagem', { postId: post.id })}
-            >
-              <View key={post.id} style={styles.post}>
-                <View style={styles.postHeader}>
-                  <Image source={{ uri: base64ToImage(post.imagem_usuario) }} style={styles.userImage} />
-                  <Text style={styles.postAutor}>{post.nome_usuario}</Text>
+          {posts.length === 0 ? (
+            <View style={styles.noPostsContainer}>
+            <Image
+              source={require('../Imagens/EmojiChorando.png')} // Substitua pelo caminho da sua imagem
+              style={styles.noPostsImage}
+            />
+            <Text style={styles.noPostsText}>Não há publicações disponíveis.</Text>
+          </View>
+          ) : (
+            posts.map((post) => (
+              <TouchableWithoutFeedback
+                key={post.id}
+                onPress={() => navigation.navigate('Postagem', { postId: post.id })}
+              >
+                <View key={post.id} style={styles.post}>
+                  <View style={styles.postHeader}>
+                    <Image source={{ uri: base64ToImage(post.imagem_usuario) }} style={styles.userImage} />
+                    <Text style={styles.postAutor}>{post.nome_usuario}</Text>
+                  </View>
+                  <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
+                  <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
+                  <Text style={styles.postInfo}>Postado a {formatTimeAgo(post.timestamp)}</Text>
                 </View>
-                <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
-                <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
-                <Text style={styles.postInfo}>Postado a {formatTimeAgo(post.timestamp)}</Text>
-              </View>
-            </TouchableWithoutFeedback>
-          ))}
+              </TouchableWithoutFeedback>
+            ))
+          )}
         </View>
       </ScrollView>
     </View>
@@ -135,6 +145,24 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     padding: 20,
+  },
+  noPostsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noPostsImage: {
+    marginTop: 150,
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+  },
+  noPostsText: {
+    fontSize: 20,
+    width: 300,
+    color: '#3E5481',
+    fontFamily: 'Inter-bold',
+    textAlign: 'center',
   },
   post: {
     width: '48%',

@@ -67,8 +67,7 @@ const Perfil = () => {
     // Lógica para obter as postagens do usuário
     const fetchPosts = async () => {
       try {
-        const apiUrl = `https://cima-production.up.railway.app/postagem?codusuario=${userId}`;
-        console.log(`ApiUrl: ${apiUrl}`);
+        const apiUrl = `https://cima-production.up.railway.app/postagem/usuario/${userId}`;
 
         const response = await axios.get(apiUrl);
         setPosts(response.data);
@@ -237,18 +236,27 @@ const handleImageSelection = async (result) => {
         </View>
       </View>
       <View style={styles.postContainer}>
-        {posts.map((post) => (
-          <View key={post.id} style={styles.post}>
-            <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
-            <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
-            <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)}</Text>
+        {posts.length === 0 ? (
+          <View style={styles.noPostsContainer}>
+            <Image
+              source={require('../Imagens/EmojiChorando.png')} // Substitua pelo caminho da sua imagem
+              style={styles.noPostsImage}
+            />
+            <Text style={styles.noPostsText}>Você ainda não fez nenhuma publicação.</Text>
           </View>
-        ))}
+        ) : (
+          posts.map((post) => (
+            <View key={post.id} style={styles.post}>
+              <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
+              <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
+              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)}</Text>
+            </View>
+          ))
+        )}
       </View>
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -300,7 +308,7 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: '100%',
-    height: '70%',
+    height: '75%',
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
     resizeMode: 'cover',
@@ -335,17 +343,34 @@ const styles = StyleSheet.create({
     height: 3,
     backgroundColor: '#F26101',
     marginTop: 5,
-    marginLeft: 5,
     position: 'fixed',
     bottom: -24,
   },
   Line2: {
     width: 450,
     height: 3,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: '#dddddd',
     marginTop: 0,
     position: 'absolute',
     bottom: -24,
+  },
+  noPostsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noPostsImage: {
+    width: 150, // Ajuste conforme necessário
+    height: 150, // Ajuste conforme necessário
+    marginBottom: 20,
+    marginTop: 50,
+  },
+  noPostsText: {
+    fontSize: 18,
+    width: 200,
+    color: '#3E5481',
+    fontFamily: 'Inter-bold',
+    textAlign: 'center',
   },
 });
 

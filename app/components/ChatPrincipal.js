@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   FlatList,
   SafeAreaView,
-  Alert,
   Modal,
   Image,
   KeyboardAvoidingView,
@@ -15,21 +14,18 @@ import {
 import { useLogin } from '../context/LoginProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
 
 function ChatPrincipal() {
-  const { profile, userId, registerProfileImageCallback, updateProfileImage } = useLogin();
+  const { profile, userId } = useLogin();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [userName, setUserName] = useState('');
 
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io('http://192.168.0.114:3000', {
+    socketRef.current = io('http://10.32.12.0:3000', {
       reconnection: true,
     });
 
@@ -55,48 +51,11 @@ function ChatPrincipal() {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         bairro: profile.bairro, // Adicione o bairro do remetente
       };
-  
+
       // Enviar a mensagem apenas para usuários do mesmo bairro
       socketRef.current.emit('chat message', newMessage, profile.bairro);
       setMessage('');
     }
-  };
-  const newMessage = {
-    text: message,
-    isUserMessage: true,
-    userName: profile.nome,
-    userId: `https://cima-production.up.railway.app/usuario/${userId}`,
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    bairro: profile.bairro, 
-  };
-  const clearMessagesLocally = async () => {
-    if (messages.length === 0) {
-      Alert.alert('Sem mensagens para apagar.');
-      return;
-    }
-
-    Alert.alert(
-      'Confirmar exclusão',
-      'Tem certeza de que deseja apagar todas as mensagens permanentemente?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Apagar',
-          onPress: async () => {
-            try {
-              await AsyncStorage.removeItem('chatMessages');
-              setMessages([]);
-            } catch (error) {
-              console.error('Erro ao apagar mensagens localmente:', error);
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
   };
 
   const saveMessageLocally = async (message) => {
@@ -143,27 +102,28 @@ function ChatPrincipal() {
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           deleted: true,
         };
-  
+
         // Enviar a mensagem especial indicando exclusão apenas para o usuário local
         socketRef.current.emit('chat message', deleteMessage);
-  
+
         // Atualizar a lista local, marcando a mensagem como excluída apenas para o usuário local
         const updatedMessages = messages.map((msg) =>
           msg === selectedMessage && msg.userId === `https://cima-production.up.railway.app/usuario/${userId}`
             ? { ...msg, deleted: true }
             : msg
         );
-  
+
         await AsyncStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
         setMessages(updatedMessages);
-  
+
         setSelectedMessage(null);
         setModalVisible(false);
       } catch (error) {
         console.error('Erro ao excluir mensagem localmente:', error);
       }
     }
-  };  
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -171,39 +131,46 @@ function ChatPrincipal() {
     >
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={clearMessagesLocally}>
-            <Icon name="trash" size={24} color="black" style={styles.trashIcon} />
-          </TouchableOpacity>
+          <Text style={styles.headerText}>CHAT - BAIRRO</Text>
         </View>
         <FlatList
-  style={styles.messageList}
-  data={messages.filter(
-    (msg) =>
-      !msg.deleted && // Verificar se a mensagem não foi excluída
-      (msg.bairro === profile.bairro || msg.userId === `https://cima-production.up.railway.app/usuario/${userId}`)
-  )}
-  keyExtractor={(item, index) => index.toString()}
-  renderItem={({ item }) => (
-    <TouchableOpacity
-      onLongPress={() => handleLongPress(item)}
-      style={[
-        styles.messageContainer,
-        item.userId === `https://cima-production.up.railway.app/usuario/${userId}`
-          ? styles.userMessageContainer
-          : styles.receiverMessageContainer,
-        isReceivedImage(item) ? styles.receivedImageContainer : null,
-      ]}
-    >
-      <Text style={styles.userNameText}>{item.userName}</Text>
-      {isReceivedImage(item) ? (
-        <Image source={{ uri: item.imageURL }} style={styles.receivedImage} />
-      ) : (
-        <Text style={styles.messageText}>{item.text}</Text>
-      )}
-      <Text style={styles.timestampText}>{item.timestamp}</Text>
-    </TouchableOpacity>
-  )}
-/>
+          style={styles.messageList}
+          data={messages.filter(
+            (msg) =>
+              !msg.deleted &&
+              (msg.bairro === profile.bairro ||
+                msg.userId === `https://cima-production.up.railway.app/usuario/${userId})`
+  ))}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              onLongPress={() => handleLongPress(item)}
+              style={[
+                styles.messageContainer,
+                item.userId === `https://cima-production.up.railway.app/usuario/${userId}`
+                  ? styles.userMessageContainer
+                  : styles.receiverMessageContainer,
+                isReceivedImage(item) ? styles.receivedImageContainer : null,
+                index === 0 ? styles.firstMessage : null, // Adicione o estilo firstMessage à primeira mensagem
+              ]}
+            >
+              <Text style={styles.userNameText}>{item.userName}</Text>
+              {isReceivedImage(item) ? (
+                <Image source={{ uri: item.imageURL }} style={styles.receivedImage} />
+              ) : (
+                <Text
+                  style={[
+                    styles.messageText,
+                    !item.isUserMessage ? styles.receiverMessageText : null,
+                  ]}
+                >
+                  {item.text}
+                </Text>
+              )}
+              <Text style={styles.timestampText}>{item.timestamp}</Text>
+            </TouchableOpacity>
+          )}
+        />
         <Modal animationType="slide" transparent={true} visible={modalVisible}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
@@ -240,20 +207,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    paddingVertical: 30,
-    paddingHorizontal: 10,
+    backgroundColor: '#304269',
+    height: 180,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: -1,
   },
-  trashIcon: {
-    marginLeft: 'auto',
-    marginTop: 20,
+  headerText: {
+    fontSize: 24,
+    fontFamily: 'Inter-bold',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    top: 100,
+    left: 110,
+    position: 'absolute',
+    color: '#fff', // Marrom
   },
   messageList: {
     flex: 1,
-    padding: 16,
+    padding: 8,
   },
   messageContainer: {
     backgroundColor: '#fff',
@@ -261,7 +235,6 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 8,
     minWidth: 100,
-    alignSelf: 'flex-end',
   },
   userMessageContainer: {
     alignSelf: 'flex-end',
@@ -289,6 +262,11 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
     textAlign: 'right',
+  },
+  receiverMessageText: {
+    fontSize: 16,
+    textAlign: 'left',
+    color: '#2E3E5C', // ou qualquer cor desejada para o texto das mensagens recebidas
   },
   inputContainer: {
     flexDirection: 'row',
@@ -336,5 +314,8 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 16,
     color: 'black',
+  },
+  firstMessage: {
+    marginTop: 180, // ou qualquer valor de margem superior desejado
   },
 });

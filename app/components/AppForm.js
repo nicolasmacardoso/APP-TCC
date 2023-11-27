@@ -43,7 +43,7 @@ export default function AppForm({ navigation }) {
 
   return (
     <View style={{ flex: 1, paddingTop: 180}}>
-      <View style={{ height: 80 }}>
+      <View style={{ height: 100 }}>
         <FormHeader
           leftHeading='Bem-vindo '
           rightHeading='de volta'
@@ -78,17 +78,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center', 
-  },
-  loginButton: {
-    flex: 1,
-    height: 80,
-  },
-  signupButton: {
-    flex: 1,
-    height: 80,
   },
 });

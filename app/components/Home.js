@@ -10,7 +10,7 @@ const Home = () => {
   const navigation = useNavigation();
 
   const [posts, setPosts] = useState([]);
-  const [scrollY, setScrollY] = useState(new Animated.Value(0));
+  const [searchTerm, setSearchTerm] = useState('');
 
   const base64ToImage = (base64) => {
     return `data:image/jpeg;base64,${base64}`;
@@ -33,66 +33,72 @@ const Home = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  const handleSearchChange = (text) => {
+    setSearchTerm(text);
+  };
+
   const formatTimeAgo = (timestamp) => {
-    const now = new Date();
     const postTime = new Date(timestamp);
-    const timeDiff = now - postTime;
-
+  
+    // Diferença em milissegundos entre a data atual e a data da postagem
+    const timeDiff = new Date() - postTime;
+  
+    // Converter a diferença para minutos
     const minutes = Math.floor(timeDiff / (1000 * 60));
-
-    if (minutes < 60) {
+  
+    if (minutes < 1) {
+      return 'Agora mesmo';
+    } else if (minutes < 60) {
       return `${minutes} min atrás`;
-    } else {
+    } else if (minutes < 1440) {
       const hours = Math.floor(minutes / 60);
-      if (hours < 24) {
-        return `${hours}h atrás`;
-      } else {
-        const days = Math.floor(hours / 24);
-        return `${days}d atrás`;
-      }
+      return `${hours}h atrás`;
+    } else {
+      const days = Math.floor(minutes / 1440);
+      return `${days}d atrás`;
     }
   };
 
-  const headerHeight = scrollY.interpolate({
-    inputRange: [0, 50],
-    outputRange: [70, 20],
-    extrapolate: 'clamp',
-  });
+  const filteredPosts = posts.filter((post) =>
+    post.titulo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} bounces={false}>
       <View style={styles.searchBar}>
         <TextInput
           style={styles.searchInput}
           placeholder="Pesquisa"
           placeholderTextColor="#8E94AF"
+          value={searchTerm}
+          onChangeText={handleSearchChange}
         />
         <View style={styles.searchIcon}>
           <FontAwesome name="search" size={20} color="#304269" />
         </View>
       </View>
-      <ScrollView
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={20}
-        contentContainerStyle={styles.scrollContainer}
-      >
+      <ScrollView style={styles.Scrollcontainer} bounces={false}>
         <View style={styles.postContainer}>
-          {posts.length === 0 ? (
+          {filteredPosts.length === 0 ? (
             <View style={styles.noPostsContainer}>
-            <Image
-              source={require('../Imagens/EmojiChorando.png')} // Substitua pelo caminho da sua imagem
-              style={styles.noPostsImage}
-            />
-            <Text style={styles.noPostsText}>Não há publicações disponíveis.</Text>
-          </View>
+              <Image
+                source={require('../Imagens/EmojiChorando.png')}
+                style={styles.noPostsImage}
+              />
+              <Text style={styles.noPostsText}>Nenhuma postagem encontrada.</Text>
+            </View>
           ) : (
-            posts.map((post) => (
+            filteredPosts.map((post) => (
               <TouchableWithoutFeedback
                 key={post.id}
-                onPress={() => navigation.navigate('Postagem', { postId: post.id })}
+                onPress={() => navigation.navigate('Postagem', { 
+                  postId: post.id,
+                  postTitulo: post.titulo, 
+                  postImagem: post.imagem, 
+                  postNomeUsuario: post.nome_usuario, 
+                  postImagemUsuario: post.imagem_usuario,
+                  postDescricao: post.descricao,
+                })}
               >
                 <View key={post.id} style={styles.post}>
                   <View style={styles.postHeader}>
@@ -101,20 +107,24 @@ const Home = () => {
                   </View>
                   <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
                   <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
-                  <Text style={styles.postInfo}>Postado a {formatTimeAgo(post.timestamp)}</Text>
+                  <Text style={styles.postInfo}>Postado a {formatTimeAgo(post.data)}</Text>
                 </View>
               </TouchableWithoutFeedback>
             ))
           )}
         </View>
       </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  Scrollcontainer: {
+    height: 1000,
     backgroundColor: '#fff',
   },
   searchBar: {
@@ -144,7 +154,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    padding: 20,
+    padding: 10,
   },
   noPostsContainer: {
     flex: 1,
@@ -174,6 +184,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+    marginTop: 20,
   },
   userImage: {
     width: 50,
@@ -204,6 +215,7 @@ const styles = StyleSheet.create({
   },
   postInfo: {
     fontSize: 12,
+    fontFamily: 'Inter-Regular',
     color: '#9FA5C0',
     textAlign: 'left',
   },

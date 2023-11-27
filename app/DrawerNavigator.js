@@ -137,7 +137,8 @@ const CustomDrawer = (props) => {
         }}
         onPress={logoutHandler}
       >
-        <Text  style={{fontSize: 20, color: '#fff', fontFamily: 'Inter-bold', paddingLeft: 50}}>Sair</Text>
+        <FontAwesome name="sign-out" size={30} color="#fff" style={{position: 'absolute', top: 17, left: 20,}} />
+        <Text  style={{fontSize: 20, color: '#fff', fontFamily: 'Inter-bold', paddingLeft: 40}}>Sair</Text>
       </TouchableOpacity>
     </View>
   );
@@ -179,6 +180,7 @@ const DrawerNavigator = () => {
         headerShown: false,
         drawerLabelStyle: {
           color: '#304269', // Cor do texto do item do menu
+          marginLeft: -20,
         },
         drawerActiveBackgroundColor: '#FFE2D1', // Cor de fundo quando a página está ativa
         drawerInactiveBackgroundColor: '#fff', // Cor de fundo quando a página não está ativa
@@ -190,7 +192,7 @@ const DrawerNavigator = () => {
         name='Home'
         options={{
           drawerIcon: ({ focused, color, size }) => (
-            <FontAwesome name="home" size={30} color="#304269" />
+            <FontAwesome name="home" size={29} color="#304269" />
           ),
         }}
       />
@@ -208,7 +210,7 @@ const DrawerNavigator = () => {
         name='Bate-Papo'
         options={{
           drawerIcon: ({ focused, color, size }) => (
-            <FontAwesome name="comments-o" size={30} color="#304269" /> // Mudando a cor para verde
+            <FontAwesome name="comments" size={26} color="#304269" /> // Mudando a cor para verde
           ),
         }}
       />
@@ -217,7 +219,7 @@ const DrawerNavigator = () => {
         name='Meu Perfil'
         options={{
           drawerIcon: ({ focused, color, size }) => (
-            <FontAwesome name="user" size={30} color="#304269" />
+            <FontAwesome name="user" size={34} color="#304269" />
           ),
         }}
       />

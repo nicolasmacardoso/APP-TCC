@@ -28,6 +28,7 @@ const CreatePostScreen = () => {
   const [errorDescricao, setErrorDescricao] = useState('');
 
   const { userId, profile } = useLogin();
+  const [dataPublicacao, setDataPublicacao] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -81,7 +82,9 @@ const CreatePostScreen = () => {
     try {
       const isBase64 = imagem.startsWith('data:image');
       const imageData = isBase64 ? imagem : await convertImageToBase64(imagem);
-
+      
+      const dataAtual = new Date();
+      const dataFormatada = dataAtual.toISOString();
       // Criar um objeto com os dados da postagem
       const postData = {
         titulo: titulo,
@@ -90,6 +93,7 @@ const CreatePostScreen = () => {
         codusuario: userId,
         nome_usuario: profile.usuario,
         imagem_usuario: profile.imagem,
+        data: dataFormatada,
       };
 
       // Enviar a postagem para o servidor usando a API

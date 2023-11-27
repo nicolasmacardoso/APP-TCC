@@ -9,6 +9,7 @@ const LoginProvider = ({ children }) => {
   const [profileImagem, setProfileImagem] = useState({});
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
+  const [userBairro, setUserBairro] = useState(null);
   const [profileImageCallback, setProfileImageCallback] = useState(null);
   const [profileUpdateKey, setProfileUpdateKey] = useState(0);
 
@@ -40,6 +41,7 @@ const LoginProvider = ({ children }) => {
   
       setProfile(user);
       setUserId(user.id);
+      setUserBairro(user.codbairro);      
       setProfileImagem(user.imagem);
   
       if (profileImageCallback) {
@@ -110,6 +112,7 @@ const LoginProvider = ({ children }) => {
         logout,
         loading,
         userId,
+        userBairro,
         registerProfileImageCallback,
         updateProfileImage,
         profileUpdateKey, 

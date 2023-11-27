@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Animated, View, ScrollView, StyleSheet, Text, TextInput, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { useLogin } from '../context/LoginProvider';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,6 +12,8 @@ const Home = () => {
 
   const [posts, setPosts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const { userBairro } = useLogin();
+
 
   const base64ToImage = (base64) => {
     return `data:image/jpeg;base64,${base64}`;
@@ -19,7 +22,8 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://cima-production.up.railway.app/postagem');
+        const response = await axios.get(`https://cima-production.up.railway.app/postagem/bairro/${userBairro}`);
+        console.log(`https://cima-production.up.railway.app/postagem/bairro/${userBairro}`)
         setPosts(response.data);
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
@@ -31,7 +35,7 @@ const Home = () => {
     const intervalId = setInterval(fetchData, 5000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [userBairro]);
 
   const handleSearchChange = (text) => {
     setSearchTerm(text);
@@ -77,6 +81,8 @@ const Home = () => {
           <FontAwesome name="search" size={20} color="#304269" />
         </View>
       </View>
+      <Text style={styles.tituloCodBairro}>Código do bairro: {userBairro}</Text>
+
       <ScrollView style={styles.Scrollcontainer} bounces={false}>
         <View style={styles.postContainer}>
           {filteredPosts.length === 0 ? (
@@ -149,12 +155,22 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     paddingLeft: 60,
   },
+  tituloCodBairro: {
+    color: '#fff',
+    width: '100%',
+    fontSize: 20,
+    fontFamily: 'Inter-bold',
+    paddingLeft: 110,
+    paddingVertical: 10,
+    backgroundColor: '#354279',
+  },  
   postContainer: {
     backgroundColor: '#fff',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     padding: 10,
+    marginTop: 10,
   },
   noPostsContainer: {
     flex: 1,

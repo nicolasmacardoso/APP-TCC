@@ -4,8 +4,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { useLogin } from '../context/LoginProvider';
 import { FontAwesome } from '@expo/vector-icons'; 
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 const Perfil = () => {
+  const navigation = useNavigation();
+
   const { profileUpdateKey, profile, userId, registerProfileImageCallback, updateProfileImage } = useLogin();
   const [profileImage, setProfileImage] = useState('');
   const [refreshKey, setRefreshKey] = useState(0); // Novo estado para forçar remontagem
@@ -246,11 +250,22 @@ const handleImageSelection = async (result) => {
           </View>
         ) : (
           posts.map((post) => (
-            <View key={post.id} style={styles.post}>
-              <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
-              <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
-              <Text style={styles.postInfo}>{formatTimeAgo(post.timestamp)}</Text>
-            </View>
+              <View key={post.id} style={styles.post}>
+                <TouchableWithoutFeedback 
+                key={post.id}
+                  onPress={() => navigation.navigate('Postagem', { 
+                    postId: post.id,
+                    postTitulo: post.titulo, 
+                    postImagem: post.imagem, 
+                    postNomeUsuario: post.nome_usuario, 
+                    postImagemUsuario: post.imagem_usuario,
+                    postDescricao: post.descricao,
+                  })}>
+                <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
+                <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
+                <Text style={styles.postInfo}>{formatTimeAgo(post.data)}</Text>
+                </TouchableWithoutFeedback>
+              </View>
           ))
         )}
       </View>

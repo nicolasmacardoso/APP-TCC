@@ -48,12 +48,12 @@ const CustomDrawer = (props) => {
       return (
         <Image
           source={{ uri: profileImage }}
-          style={{ width: 80, height: 80, borderRadius: 100, borderWidth: 4, borderColor: '#6180BF', marginLeft: -10}}
+          style={{ width: 80, height: 80, borderRadius: 100, borderWidth: 4, borderColor: '#6180BF', marginLeft: -5}}
         />
       );
     } else {
       return (
-        <View style={{ width: 80, height: 80, borderRadius: 50, backgroundColor: '#FFFFFF', borderColor: '#6180BF', borderWidth: 4}}>
+        <View style={{ width: 80, height: 80, borderRadius: 50, backgroundColor: '#FFFFFF', borderColor: '#6180BF', borderWidth: 4, marginLeft: -5}}>
           <FontAwesome name="user-circle" size={72.333} color="#757575" />
         </View>
       );
@@ -190,13 +190,37 @@ const DrawerNavigator = () => {
         name='Home'
         options={{
           drawerIcon: ({ focused, color, size }) => (
-            <FontAwesome name="home" size={size} color={color} />
+            <FontAwesome name="home" size={30} color="#304269" />
           ),
         }}
       />
-      <Drawer.Screen component={CriarPosts} name='Criar Publicação' />
-      <Drawer.Screen component={ChatPrincipal} name='Bate-Papo' />
-      <Drawer.Screen component={UserProfile} name='Meu Perfil' />
+      <Drawer.Screen
+        component={CriarPosts}
+        name='Criar Publicação'
+        options={{
+          drawerIcon: ({ focused, color, size }) => (
+            <FontAwesome name="pencil" size={30} color="#304269" />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        component={ChatPrincipal}
+        name='Bate-Papo'
+        options={{
+          drawerIcon: ({ focused, color, size }) => (
+            <FontAwesome name="comments-o" size={30} color="#304269" /> // Mudando a cor para verde
+          ),
+        }}
+      />
+      <Drawer.Screen
+        component={UserProfile}
+        name='Meu Perfil'
+        options={{
+          drawerIcon: ({ focused, color, size }) => (
+            <FontAwesome name="user" size={30} color="#304269" />
+          ),
+        }}
+      />
     </Drawer.Navigator>
   );
 
@@ -208,9 +232,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'left',
     paddingLeft: 10,
-
   }
 })
+
 export default DrawerNavigator;

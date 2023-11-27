@@ -27,7 +27,7 @@ const CreatePostScreen = () => {
   const [errortitulo, setErrortitulo] = useState('');
   const [errorDescricao, setErrorDescricao] = useState('');
 
-  const { userId } = useLogin();
+  const { userId, profile } = useLogin();
 
   useEffect(() => {
     (async () => {
@@ -88,6 +88,8 @@ const CreatePostScreen = () => {
         descricao: descricao,
         imagem: imageData,
         codusuario: userId,
+        nome_usuario: profile.usuario,
+        imagem_usuario: profile.imagem,
       };
 
       // Enviar a postagem para o servidor usando a API
@@ -143,7 +145,7 @@ const CreatePostScreen = () => {
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <KeyboardAwareScrollView
         contentContainerStyle={styles.container}
-        extraScrollHeight={Platform.select({ ios: 150, android: 0 })}
+        extraScrollHeight={Platform.select({ ios: 50, android: 0 })}
         enableOnAndroid
         bounces={false}
       >

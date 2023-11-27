@@ -68,8 +68,8 @@ const Perfil = () => {
     const fetchPosts = async () => {
       try {
         const apiUrl = `https://cima-production.up.railway.app/postagem?codusuario=${userId}`;
-/*         console.log(`Trying to fetch posts from: ${apiUrl}`);
- */  
+        console.log(`ApiUrl: ${apiUrl}`);
+
         const response = await axios.get(apiUrl);
         setPosts(response.data);
       } catch (error) {
@@ -98,7 +98,7 @@ const Perfil = () => {
   
       const options = {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.05,
+        quality: 0.1,
         allowsEditing: true,
         storageOptions: {
           skipBackup: true,

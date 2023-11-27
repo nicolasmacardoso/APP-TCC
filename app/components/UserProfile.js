@@ -316,10 +316,12 @@ const styles = StyleSheet.create({
   },
   post: {
     width: '48%',
-    aspectRatio: 0.7,
-    backgroundColor: '#ADD8E6',
+    aspectRatio: 0.64,
+    backgroundColor: '#304269',
     borderRadius: 8,
     marginBottom: 16,
+    borderColor: '#304269',
+    borderWidth: 3,
   },
   postImage: {
     width: '100%',
@@ -332,11 +334,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     padding: 8,
+    color: "#fff",
     textAlign: 'center',
   },
   postInfo: {
     fontSize: 12,
-    color: '#000',
+    color: "#fff",
     textAlign: 'center',
   },
   publicationsContainer: {

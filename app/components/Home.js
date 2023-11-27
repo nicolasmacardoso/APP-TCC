@@ -23,7 +23,6 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`https://cima-production.up.railway.app/postagem/bairro/${userBairro}`);
-        console.log(`https://cima-production.up.railway.app/postagem/bairro/${userBairro}`)
         setPosts(response.data);
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
@@ -108,12 +107,16 @@ const Home = () => {
               >
                 <View key={post.id} style={styles.post}>
                   <View style={styles.postHeader}>
-                    <Image source={{ uri: base64ToImage(post.imagem_usuario) }} style={styles.userImage} />
+                    {post.imagem_usuario ? (
+                      <Image source={{ uri: base64ToImage(post.imagem_usuario) }} style={styles.userImage} />
+                    ) : (
+                      <FontAwesome name="user-circle" size={50} color="#9FA5C0" style={styles.defaultUserIcon} />
+                    )}
                     <Text style={styles.postAutor}>{post.nome_usuario}</Text>
                   </View>
-                  <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
-                  <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
-                  <Text style={styles.postInfo}>Postado a {formatTimeAgo(post.data)}</Text>
+                    <Image source={{ uri: base64ToImage(post.imagem) }} style={styles.postImage} />
+                    <Text style={styles.postTitle} numberOfLines={2} ellipsizeMode="tail">{post.titulo}</Text>
+                    <Text style={styles.postInfo}>Postado a {formatTimeAgo(post.data)}</Text>
                 </View>
               </TouchableWithoutFeedback>
             ))
@@ -192,9 +195,13 @@ const styles = StyleSheet.create({
   },
   post: {
     width: '48%',
-    aspectRatio: 0.7,
-    borderRadius: 8,
+    backgroundColor: '#304269',
+    aspectRatio: 0.6,
+    borderRadius: 10,
     marginBottom: 30,
+    paddingBottom: 75,
+    borderColor: '#304269',
+    borderWidth: 5,
   },
   postHeader: {
     flexDirection: 'row',
@@ -211,7 +218,7 @@ const styles = StyleSheet.create({
   postAutor: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#3E5481',
+    color: '#fff',
     textAlign: 'left',
   },
   postImage: {
@@ -222,7 +229,7 @@ const styles = StyleSheet.create({
   },
   postTitle: {
     fontSize: 17,
-    color: '#3E5481',
+    color: '#fff',
     fontFamily: 'Inter-Extrabold',
     fontWeight: 'bold',
     padding: 8,
@@ -232,7 +239,7 @@ const styles = StyleSheet.create({
   postInfo: {
     fontSize: 12,
     fontFamily: 'Inter-Regular',
-    color: '#9FA5C0',
+    color: '#fff',
     textAlign: 'left',
   },
 });

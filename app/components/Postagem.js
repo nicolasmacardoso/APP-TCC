@@ -1,6 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { ScrollView, View, Text, StyleSheet, Image } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons'; // Importe o FontAwesome
 
 const Postagem = ({ route }) => {
   const { postId, postTitulo, postDescricao, postImagemUsuario, postNomeUsuario, postImagem } = route.params;
@@ -29,7 +30,11 @@ const Postagem = ({ route }) => {
         <Image source={{ uri: base64ToImage(post.imagemPost) }} style={styles.imagemPost} />
 
         <View style={styles.usuarioContainer}>
-          <Image source={{ uri: base64ToImage(post.imagemUsuario)}} style={styles.imagemUsuario} />
+          {post.imagemUsuario ? (
+            <Image source={{ uri: base64ToImage(post.imagemUsuario) }} style={styles.imagemUsuario} />
+          ) : (
+            <FontAwesome name="user-circle" size={40} color="#9FA5C0" style={styles.defaultUserIcon} />
+          )}
           <Text style={styles.nomeUsuario}>{post.nomeUsuario}</Text>
         </View>
 
